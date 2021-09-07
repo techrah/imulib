@@ -4,10 +4,11 @@
 #include <stdint.h>
 #include "serial/ISerial.hpp"
 #include "serial/Logger.hpp"
+#include "ICSerial.hpp"
 
 using namespace serial;
 
-class MPU65xx
+class MPU65xx : public ICSerial
 {
 public:
     static const uint8_t I2C_SLV_ADDR[];
@@ -66,13 +67,6 @@ public:
         EXT_SENS_DATA_23 = 0x60
     };
 
-    struct RawValues
-    {
-        uint16_t mx;
-        uint16_t my;
-        uint16_t mz;
-    };
-
 public:
     MPU65xx(ISerial *const serial, Logger *const logger = new Logger());
     ~MPU65xx();
@@ -83,10 +77,6 @@ public:
     void readSlv(enum I2CSlv slv, int reg, enum ExtSensData esd, uint8_t *out, int count, unsigned long delayMs = 1);
     void writeSlv(enum I2CSlv slv, int reg, uint8_t data);
     RawValues getRawSensorValues();
-
-private:
-    ISerial *const _serial;
-    Logger *const _logger;
 };
 
 #endif

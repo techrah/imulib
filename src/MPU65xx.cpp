@@ -6,7 +6,7 @@ const uint8_t MPU65xx::I2C_SLV_REG[] = {0x26, 0x29, 0x2C, 0x2F, 0x32};
 const uint8_t MPU65xx::I2C_SLV_CTRL[] = {0x27, 0x2A, 0x2D, 0x30, 0x33};
 const uint8_t MPU65xx::I2C_SLV_DO[] = {0x63, 0x64, 0x65, 0x66};
 
-MPU65xx::MPU65xx(ISerial *const serial, Logger *const logger) : _serial(serial), _logger(logger)
+MPU65xx::MPU65xx(ISerial *const serial, Logger *const logger) : ICSerial(serial, logger)
 {
     // WHO_AM_I
     uint8_t mpuId = whoAmI();
@@ -49,6 +49,9 @@ void MPU65xx::shutdown()
     // disable master mode
     _serial->writeReg(0x6A, 0x00);
 
+    // disable bypass
+    _serial->writeReg(0x37, 0x00); // (INT_PIN_CFG)
+
     // power down
     writeSlv(I2CSlv0, 0x0A, 0x0);        // CNTL1
     _serial->writeReg(0x6B, 0b01000000); // SLEEP
@@ -85,7 +88,7 @@ void MPU65xx::writeSlv(enum I2CSlv slv, int reg, uint8_t data)
     _serial->writeReg(MPU65xx::I2C_SLV_DO[slv], data);
 }
 
-MPU65xx::RawValues MPU65xx::getRawSensorValues()
+RawValues MPU65xx::getRawSensorValues()
 {
     RawValues v;
     uint8_t data[8];
