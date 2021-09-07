@@ -2,8 +2,8 @@
 #define __MPU65xx_hpp__
 
 #include <stdint.h>
-#include "ISerial.hpp"
-#include "Logger.hpp"
+#include "serial/ISerial.hpp"
+#include "serial/Logger.hpp"
 
 using namespace serial;
 

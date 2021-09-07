@@ -1,5 +1,5 @@
 #include "MPU65xx.hpp"
-#include "util.hpp"
+#include "serial/util.hpp"
 
 const uint8_t MPU65xx::I2C_SLV_ADDR[] = {0x25, 0x28, 0x2B, 0x2E, 0x31};
 const uint8_t MPU65xx::I2C_SLV_REG[] = {0x26, 0x29, 0x2C, 0x2F, 0x32};
