@@ -1,5 +1,5 @@
-#ifndef __ISerial_hpp__
-#define __ISerial_hpp__
+#ifndef __C0BE8C0C_FAF3_4E56_83FF_005A6FF901FE__
+#define __C0BE8C0C_FAF3_4E56_83FF_005A6FF901FE__
 
 #include <stdint.h>
 #include "Bytes.hpp"

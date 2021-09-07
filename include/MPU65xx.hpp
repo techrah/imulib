@@ -1,5 +1,5 @@
-#ifndef __MPU65xx_hpp__
-#define __MPU65xx_hpp__
+#ifndef __D9F3235D_FB0E_4C8F_A47F_A5044F884476__
+#define __D9F3235D_FB0E_4C8F_A47F_A5044F884476__
 
 #include <stdint.h>
 #include "serial/ISerial.hpp"

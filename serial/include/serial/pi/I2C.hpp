@@ -1,5 +1,5 @@
-#ifndef __pi_I2C_hpp__
-#define __pi_I2C_hpp__
+#ifndef __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
+#define __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>

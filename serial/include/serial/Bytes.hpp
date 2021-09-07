@@ -1,5 +1,5 @@
-#ifndef __Bytes_hpp__
-#define __Bytes_hpp__
+#ifndef __DACFDA9A_019B_4E89_89C4_7C706C5D73BB__
+#define __DACFDA9A_019B_4E89_89C4_7C706C5D73BB__
 
 #include <stdint.h>
 #include <stdio.h>

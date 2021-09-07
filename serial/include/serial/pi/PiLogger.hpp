@@ -1,5 +1,5 @@
-#ifndef __PiLogger_hpp__
-#define __PiLogger_hpp__
+#ifndef __CD2C37DD_8201_4EF1_B965_D41066DEEF66__
+#define __CD2C37DD_8201_4EF1_B965_D41066DEEF66__
 
 #include <stdio.h>
 #include <cstdarg>
