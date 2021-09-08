@@ -39,7 +39,7 @@ public:
     virtual RawValues getRawSensorValues();
 
 private:
-    uint8_t _deviceId = 0x48;
+    static const uint8_t _deviceId = 0x48;
 };
 
 #endif

@@ -28,6 +28,8 @@ namespace serial
             _validateIndex(ix);
             return _data[ix];
         }
+        // direct access (unsafe)
+        uint8_t *dataBuf() { return _data; }
 
     private:
         inline void _validateIndex(uint8_t ix) const
