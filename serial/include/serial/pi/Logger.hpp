@@ -5,11 +5,11 @@
 #include <cstdarg>
 #include <cstdio>
 
-#include "../Logger.hpp"
+#include "../ILogger.hpp"
 
 namespace serial
 {
-    class PiLogger : public Logger
+    class Logger : public ILogger
     {
     public:
         void log(const char *fmt, ...) __attribute__((format(printf, 2, 3)))

@@ -1,13 +1,7 @@
-#ifndef __C1978B14_A092_4B73_8EBE_3CE4991F219A__
-#define __C1978B14_A092_4B73_8EBE_3CE4991F219A__
+#ifndef __A78B02F3_D86A_42F0_9B8D_454B15B09E79__
+#define __A78B02F3_D86A_42F0_9B8D_454B15B09E79__
 
-namespace serial
-{
-    class Logger
-    {
-    public:
-        virtual void log(const char *fmt, ...){};
-    };
-};
+// TODO: conditional include by platform (pi or arduino)
+#include "pi/Logger.hpp"
 
 #endif
