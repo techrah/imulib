@@ -1,51 +1,62 @@
 #ifndef __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
 #define __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
 
-#include <wiringPi.h>
-#include <wiringPiI2C.h>
+extern "C"
+{
+#include <i2c/smbus.h>
+#include <linux/i2c-dev.h>
+}
+#include <fcntl.h>
+#include <sys/ioctl.h>
 #include "../ISerial.hpp"
 #include "../exceptions.hpp"
 
 namespace serial
 {
-
     class I2C : public ISerial
     {
     private:
         int _fd;
 
     public:
-        I2C(uint8_t deviceId)
+        I2C(const char *port, uint8_t deviceAddr)
         {
-            wiringPiSetup();
-            _fd = wiringPiI2CSetup(deviceId);
-            if (_fd == 1)
+            _fd = open(port, O_RDWR);
+            if (_fd < 0)
             {
                 throw new SerialException();
             }
+            if (ioctl(_fd, I2C_SLAVE, deviceAddr) < 0)
+            {
+                throw new SerialException();
+            };
         };
         virtual void writeReg(uint8_t reg, uint8_t data)
         {
-            wiringPiI2CWriteReg8(_fd, reg, data);
+            i2c_smbus_write_byte_data(_fd, reg, data);
         }
         virtual void readReg(uint8_t reg, uint8_t *out, uint8_t count)
         {
             for (int i = 0; i < count; i++)
             {
-                out[i] = wiringPiI2CReadReg8(_fd, reg + i);
+                int res = i2c_smbus_read_byte_data(_fd, reg + i);
+                if (res < 0)
+                {
+                    throw new SerialException();
+                }
+                out[i] = static_cast<uint8_t>(res);
             }
         }
         virtual uint8_t readReg(uint8_t reg)
         {
-            return wiringPiI2CReadReg8(_fd, reg);
+            uint8_t res;
+            readReg(reg, &res, 1);
+            return res;
         }
         virtual Bytes readReg(uint8_t reg, uint8_t count)
         {
             Bytes out(count);
-            for (int i = 0; i < count; i++)
-            {
-                out[i] = wiringPiI2CReadReg8(_fd, reg);
-            }
+            readReg(reg, out.dataBuf(), count);
             return out;
         }
         virtual ~I2C(){};
