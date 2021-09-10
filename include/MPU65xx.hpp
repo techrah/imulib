@@ -16,7 +16,7 @@ public:
     ~MPU65xx();
     void startup();
     void shutdown();
-    uint8_t whoAmI();
+    uint8_t whoAmI() const;
     RawValues getRawSensorValues();
 };
 

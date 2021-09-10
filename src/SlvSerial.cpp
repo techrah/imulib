@@ -21,26 +21,17 @@ void SlvSerial::writeReg(uint8_t reg, uint8_t data)
 
 uint8_t SlvSerial::readReg(uint8_t reg)
 {
-    uint8_t byte;
-    readReg(reg, &byte, 1);
-    return byte;
+    return readReg(reg, 1)[0];
 }
 
-void SlvSerial::readReg(uint8_t reg, uint8_t *out, uint8_t count)
+serial::Bytes SlvSerial::readReg(uint8_t reg, uint8_t count)
 {
     if (reg != _esdReg)
     {
         setSlvForRead(_esd, reg, count);
         serial::delay(_esdInitialDelay);
     }
-    _serial->readReg(_esd, out, count);
-}
-
-serial::Bytes SlvSerial::readReg(uint8_t reg, uint8_t count)
-{
-    serial::Bytes bytes(count);
-    readReg(reg, bytes.dataBuf(), count);
-    return bytes;
+    return _serial->readReg(_esd, count);
 }
 
 void SlvSerial::setSlvForRead(enum SlvSerial::ExtSensData esd, int reg, uint8_t count)

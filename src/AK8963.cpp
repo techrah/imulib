@@ -1,20 +1,18 @@
 #include "AK8963.hpp"
 #include "exceptions.hpp"
+#include "serial/util.hpp"
 
 AK8963::AK8963(ISerial *const serial, Logger *const logger)
     : ICSerial(serial, logger)
 {
-    if (whoAmI() != _deviceId)
-    {
-        throw ICSerialDeviceNotFoundException(_deviceId);
-    }
+    validateDeviceId(_deviceId, "AK8963");
 }
 
 AK8963::~AK8963()
 {
 }
 
-uint8_t AK8963::whoAmI()
+uint8_t AK8963::whoAmI() const
 {
     return _serial->readReg(WIA);
 }
@@ -34,9 +32,8 @@ void AK8963::shutdown()
 RawValues AK8963::getRawSensorValues()
 {
     RawValues v;
-    uint8_t data[8];
+    Bytes data = _serial->readReg(ST1, 8);
 
-    _serial->readReg(ST1, data, 8);
     v.mx = (uint16_t)data[1] << 8 | data[2];
     v.my = (uint16_t)data[3] << 8 | data[4];
     v.mz = (uint16_t)data[5] << 8 | data[6];

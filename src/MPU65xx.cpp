@@ -5,10 +5,6 @@
 MPU65xx::MPU65xx(ISerial *const serial, Logger *const logger)
     : ICSerial(serial, logger)
 {
-    // WHO_AM_I
-    uint8_t mpuId = whoAmI();
-    _logger->log("WHO_AM_I: %#02x", mpuId);
-
     // reset
     // If resetting, must do it now before enabling bypass mode
     // as this will reset the bypass.
@@ -30,7 +26,7 @@ MPU65xx::~MPU65xx()
 {
 }
 
-uint8_t MPU65xx::whoAmI()
+uint8_t MPU65xx::whoAmI() const
 {
     return _serial->readReg(0x75);
 }

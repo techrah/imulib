@@ -35,7 +35,22 @@ namespace serial
         {
             i2c_smbus_write_byte_data(_fd, reg, data);
         }
-        virtual void readReg(uint8_t reg, uint8_t *out, uint8_t count)
+        virtual uint8_t readReg(uint8_t reg)
+        {
+            uint8_t res;
+            _readReg(reg, &res, 1);
+            return res;
+        }
+        virtual Bytes readReg(uint8_t reg, uint8_t count)
+        {
+            Bytes out(count);
+            _readReg(reg, out.dataBuf(), count);
+            return out;
+        }
+        virtual ~I2C(){};
+
+    private:
+        void _readReg(uint8_t reg, uint8_t *out, uint8_t count)
         {
             for (int i = 0; i < count; i++)
             {
@@ -47,19 +62,6 @@ namespace serial
                 out[i] = static_cast<uint8_t>(res);
             }
         }
-        virtual uint8_t readReg(uint8_t reg)
-        {
-            uint8_t res;
-            readReg(reg, &res, 1);
-            return res;
-        }
-        virtual Bytes readReg(uint8_t reg, uint8_t count)
-        {
-            Bytes out(count);
-            readReg(reg, out.dataBuf(), count);
-            return out;
-        }
-        virtual ~I2C(){};
     };
 }
 #endif

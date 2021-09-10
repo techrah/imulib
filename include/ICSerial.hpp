@@ -13,7 +13,8 @@ class ICSerial
 public:
     ICSerial(ISerial *const serial, Logger *const logger = new Logger());
     virtual ~ICSerial();
-    virtual uint8_t whoAmI() = 0;
+    virtual uint8_t whoAmI() const = 0;
+    virtual void validateDeviceId(uint8_t deviceId, const char *name) const;
     virtual void startup() = 0;
     virtual void shutdown() = 0;
     virtual RawValues getRawSensorValues() = 0;

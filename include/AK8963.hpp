@@ -33,7 +33,7 @@ public:
 public:
     AK8963(ISerial *const serial, Logger *const logger = new Logger());
     virtual ~AK8963();
-    virtual uint8_t whoAmI();
+    virtual uint8_t whoAmI() const;
     virtual void startup();
     virtual void shutdown();
     virtual RawValues getRawSensorValues();

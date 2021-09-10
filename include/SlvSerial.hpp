@@ -70,7 +70,6 @@ public:
     void setEsdInitialDelay(unsigned long delayMs) { _esdInitialDelay = delayMs; };
     virtual void writeReg(uint8_t reg, uint8_t data);
     virtual uint8_t readReg(uint8_t reg);
-    virtual void readReg(uint8_t reg, uint8_t *out, uint8_t count);
     virtual Bytes readReg(uint8_t reg, uint8_t count);
 
 private:

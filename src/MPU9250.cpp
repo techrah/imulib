@@ -3,13 +3,10 @@
 #include "SlvSerial.hpp"
 #include "exceptions.hpp"
 
-MPU9250::MPU9250(ISerial *const serial, Logger *const logger)
-    : MPU65xx(serial, logger)
+MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, Logger *const logger)
+    : MPU65xx(serial, logger), _auxSerial(auxSerial)
 {
-    if (whoAmI() != _deviceId)
-    {
-        throw ICSerialDeviceNotFoundException(_deviceId);
-    }
+    validateDeviceId(_deviceId, "MPU-9250");
 }
 
 MPU9250::~MPU9250()
@@ -18,13 +15,19 @@ MPU9250::~MPU9250()
 
 void MPU9250::startup()
 {
-    // enable bypass
-    _serial->writeReg(0x37, 0x22); // enable bypass (INT_PIN_CFG)
-    _serial->writeReg(0x6A, 0x20); // enable master mode (USER_CTL)
-    _serial->writeReg(0x24, 0x07); // set clock speed 267 kHz (I2C_MST_CTRL)
+    if (_auxSerial)
+    {
+        _mag = new AK8963(_auxSerial, _logger);
+    }
+    else
+    {
+        // enable bypass
+        _serial->writeReg(0x37, 0x22); // enable bypass (INT_PIN_CFG)
+        _serial->writeReg(0x6A, 0x20); // enable master mode (USER_CTL)
+        _serial->writeReg(0x24, 0x07); // set clock speed 267 kHz (I2C_MST_CTRL)
 
-    SlvSerial *slvSerial = new SlvSerial(0, 0x0C, _serial);
-    _mag = new AK8963(slvSerial, _logger);
+        _mag = new AK8963(new SlvSerial(0, 0x0C, _serial), _logger);
+    }
     _mag->startup();
 }
 
@@ -42,7 +45,7 @@ void MPU9250::shutdown()
     _serial->writeReg(0x6B, 0b01000000); // SLEEP
 }
 
-uint8_t MPU9250::whoAmI()
+uint8_t MPU9250::whoAmI() const
 {
     return _serial->readReg(0x75);
 }
