@@ -1,9 +1,12 @@
 #ifndef __A59C779E_15A0_4B27_B24D_DD19C551A89C__
 #define __A59C779E_15A0_4B27_B24D_DD19C551A89C__
 
+#include <vector>
 #include "serial/ISerial.hpp"
 
 using namespace serial;
+
+struct SlvConnection;
 
 class SlvSerial : public ISerial
 {
@@ -64,24 +67,38 @@ public:
         EXT_SENS_DATA_23 = 0x60
     };
 
+    static const uint8_t I2C_SLV4_ADDR = 0x31;
+    static const uint8_t I2C_SLV4_REG = 0x32;
+    static const uint8_t I2C_SLV4_DO = 0x33;
+    static const uint8_t I2C_SLV4_CTRL = 0x34;
+    static const uint8_t I2C_SLV4_DI = 0x35;
+
 public:
-    SlvSerial(uint8_t slvno, uint8_t deviceAddr, serial::ISerial *serial);
-    void setSlvForRead(enum ExtSensData esd, int reg, uint8_t count);
+    SlvSerial(uint8_t deviceAddr, serial::ISerial *serial);
+    void setSlvForRead(uint8_t slvno, enum ExtSensData esd, int reg, uint8_t count);
     void setEsdInitialDelay(unsigned long delayMs) { _esdInitialDelay = delayMs; };
     virtual void writeReg(uint8_t reg, uint8_t data);
     virtual uint8_t readReg(uint8_t reg);
     virtual Bytes readReg(uint8_t reg, uint8_t count);
 
 private:
-    uint8_t _deviceAddr;
-    uint8_t _slvno;
-    ISerial *_serial;
+    SlvConnection _addConnection(uint8_t reg, uint8_t count);
+    SlvConnection _getConnection(uint8_t reg, uint8_t count);
+    void _clearAllConnections();
 
-    // Keep track of which register is being used for incoming external sensor data
-    // and the actual register number on the external device providing the data.
-    enum ExtSensData _esd = EXT_SENS_DATA_00;
-    int _esdReg = -1;
-    unsigned long _esdInitialDelay = 20;
+private:
+    uint8_t _deviceAddr;
+    ISerial *_serial;
+    std::vector<SlvConnection> _slvConnections;
+    unsigned long _esdInitialDelay = 30;
+};
+
+struct SlvConnection
+{
+    uint8_t slvno;
+    uint8_t reg;
+    uint8_t count;
+    SlvSerial::ExtSensData esd;
 };
 
 #endif
