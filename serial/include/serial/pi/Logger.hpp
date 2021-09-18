@@ -12,8 +12,9 @@ namespace serial
     class Logger : public ILogger
     {
     public:
-        void log(const char *fmt, ...) __attribute__((format(printf, 2, 3)))
+        void log(const char *tag, const char *fmt, ...) __attribute__((format(printf, 3, 4)))
         {
+            printf("[%s] ", tag);
             va_list args;
             va_start(args, fmt);
             vprintf(fmt, args);

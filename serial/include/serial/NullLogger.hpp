@@ -8,7 +8,7 @@ namespace serial
     class NullLogger : public ILogger
     {
     public:
-        void log(const char *fmt, ...)
+        void log(const char *tag, const char *fmt, ...)
         {
         }
     };

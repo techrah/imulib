@@ -6,7 +6,7 @@ namespace serial
     class ILogger
     {
     public:
-        virtual void log(const char *fmt, ...) = 0;
+        virtual void log(const char *tag, const char *fmt, ...) = 0;
     };
 };
 

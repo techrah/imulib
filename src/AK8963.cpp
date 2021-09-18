@@ -3,10 +3,12 @@
 #include "exceptions.hpp"
 #include "serial/util.hpp"
 
+static const char *TAG = "AK8963";
+
 AK8963::AK8963(ISerial *const serial, ILogger *const logger)
     : ICSerial(serial, logger)
 {
-    validateDeviceId(_deviceId, "AK8963");
+    validateDeviceId(_deviceId, TAG);
 }
 
 AK8963::~AK8963()
@@ -51,7 +53,7 @@ CoordValues<float> AK8963::_getSensitivityMultiplierValues()
 {
     _changeMode(MODE_FUSE_ROM_ACCESS);
     Bytes b = _serial->readReg(ASAX, 3);
-    _logger->log("ASAX: %u, ASAY: %u, ASAZ: %u", b[0], b[1], b[2]);
+    _logger->log(TAG, "ASAX: %u, ASAY: %u, ASAZ: %u", b[0], b[1], b[2]);
 
     auto calcMultiplier = [](auto val)
     {
