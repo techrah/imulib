@@ -25,7 +25,7 @@ void ICSerial::validateDeviceId(uint8_t deviceId, const char *name) const
         else
         {
             _logger->log("Trying to find device ID for %s: 0x%02X", name, deviceId);
-            serial::delay(10);
+            serial::delay(1000);
         }
     }
     if (!found)

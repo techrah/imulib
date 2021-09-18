@@ -29,6 +29,8 @@ SlvConnection SlvSerial::_addConnection(uint8_t reg, uint8_t count)
         nextEsd = static_cast<ExtSensData>(last.esd + last.count);
     }
 
+    // save connection
+    printf("[add slv] slvno=%d, reg=0x%02x, count=%d, esd=0x%02x\r\n", nextSlvNo, reg, count, nextEsd);
     SlvConnection conn = {nextSlvNo, reg, count, nextEsd};
     _slvConnections.push_back(conn);
 

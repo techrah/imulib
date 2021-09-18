@@ -31,7 +31,7 @@ uint8_t MPU65xx::whoAmI() const
     return _serial->readReg(0x75);
 }
 
-RawValues MPU65xx::getRawSensorValues()
+CoordValues<int16_t> MPU65xx::getRawSensorValues()
 {
-    return RawValues();
+    return CoordValues<int16_t>();
 }

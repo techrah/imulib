@@ -17,7 +17,7 @@ public:
     void startup();
     void shutdown();
     uint8_t whoAmI() const;
-    RawValues getRawSensorValues();
+    CoordValues<int16_t> getRawSensorValues();
 };
 
 #endif

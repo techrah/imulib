@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "serial/ISerial.hpp"
 #include "serial/Logger.hpp"
-#include "RawValues.hpp"
+#include "CoordValues.hpp"
 
 using namespace serial;
 
@@ -17,7 +17,7 @@ public:
     virtual void validateDeviceId(uint8_t deviceId, const char *name) const;
     virtual void startup() = 0;
     virtual void shutdown() = 0;
-    virtual RawValues getRawSensorValues() = 0;
+    virtual CoordValues<int16_t> getRawSensorValues() = 0;
 
 protected:
     ISerial *const _serial;

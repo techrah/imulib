@@ -7,14 +7,7 @@ MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, Logger *const logg
     : MPU65xx(serial, logger), _auxSerial(auxSerial)
 {
     validateDeviceId(_deviceId, "MPU-9250");
-}
 
-MPU9250::~MPU9250()
-{
-}
-
-void MPU9250::startup()
-{
     if (_auxSerial)
     {
         _mag = new AK8963(_auxSerial, _logger);
@@ -28,6 +21,19 @@ void MPU9250::startup()
 
         _mag = new AK8963(new SlvSerial(0x0C, _serial), _logger);
     }
+}
+
+MPU9250::~MPU9250()
+{
+}
+
+void MPU9250::selfTest(struct AK8963::SelfTestResults *magTestResults)
+{
+    _mag->selfTest(magTestResults);
+}
+
+void MPU9250::startup()
+{
     _mag->startup();
 }
 
@@ -50,7 +56,7 @@ uint8_t MPU9250::whoAmI() const
     return _serial->readReg(0x75);
 }
 
-RawValues MPU9250::getRawSensorValues()
+CoordValues<int16_t> MPU9250::getRawSensorValues()
 {
     return _mag->getRawSensorValues();
 }
