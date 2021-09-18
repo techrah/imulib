@@ -94,7 +94,7 @@ public:
     AK8963(ISerial *const serial, Logger *const logger = new Logger());
     virtual ~AK8963();
     virtual uint8_t whoAmI() const;
-    virtual bool selfTest(struct SelfTestResults *out = nullptr);
+    virtual bool selfTest(struct SelfTestResults *out = nullptr, enum CNTL1Flags bitFlag = BIT_16_BIT_OUTPUT);
     virtual void startup();
     virtual void shutdown();
     virtual CoordValues<int16_t> getRawSensorValues();

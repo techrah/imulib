@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "AK8963.hpp"
 #include "exceptions.hpp"
 #include "serial/util.hpp"
@@ -65,30 +66,30 @@ CoordValues<float> AK8963::_getSensitivityMultiplierValues()
     return r;
 }
 
-bool AK8963::selfTest(struct SelfTestResults *out)
+bool AK8963::selfTest(struct SelfTestResults *out, enum AK8963::CNTL1Flags bitFlag)
 {
+    static const float normalRanges14[] = {-50, 50, -50, 50, -800, -200};
+    static const float normalRanges16[] = {-200, 200, -200, 200, -3200, -800};
+
+    assert(bitFlag == BIT_14_BIT_OUTPUT || bitFlag == BIT_16_BIT_OUTPUT);
+
     auto smv = _getSensitivityMultiplierValues();
 
     _changeMode(MODE_POWER_DOWN);
     _serial->writeReg(ASTC, SELF);
-    _serial->writeReg(CNTL1, BIT_16_BIT_OUTPUT | MODE_SELF_TEST);
+    _serial->writeReg(CNTL1, bitFlag | MODE_SELF_TEST);
     serial::delay(100);
-    while ((_serial->readReg(ST1) | DRDY) != DRDY_READY)
-    {
-    }
-    Bytes data = _serial->readReg(HXL, 6);
+    auto values = getRawSensorValuesSync();
     _serial->writeReg(ASTC, 0);
     _changeMode(MODE_POWER_DOWN);
-    auto values = _xyzBytesToInts(data);
 
     CoordValues<float> fv(values);
-    fv['x'] *= smv['x'];
-    fv['y'] *= smv['y'];
-    fv['z'] *= smv['z'];
+    fv *= smv.data();
 
-    bool pass = fv['x'] >= -200.0f && fv['x'] <= 200.0f &&
-                fv['y'] >= -200.0f && fv['y'] <= 200.0f &&
-                fv['z'] >= -3200.0f && fv['z'] <= -800.0f;
+    const float *ranges = bitFlag == BIT_16_BIT_OUTPUT ? normalRanges16 : normalRanges14;
+    bool pass = fv[0] >= ranges[0] && fv[0] <= ranges[1] &&
+                fv[1] >= ranges[2] && fv[1] <= ranges[3] &&
+                fv[2] >= ranges[4] && fv[2] <= ranges[5];
 
     if (out)
     {
