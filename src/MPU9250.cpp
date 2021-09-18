@@ -56,7 +56,7 @@ uint8_t MPU9250::whoAmI() const
     return _serial->readReg(0x75);
 }
 
-CoordValues<int16_t> MPU9250::getRawSensorValues()
+CoordValues<int16_t> MPU9250::getRawSensorValuesSync()
 {
-    return _mag->getRawSensorValues();
+    return _mag->getRawSensorValuesSync();
 }

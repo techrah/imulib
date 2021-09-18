@@ -97,7 +97,7 @@ public:
     virtual bool selfTest(struct SelfTestResults *out = nullptr, enum CNTL1Flags bitFlag = BIT_16_BIT_OUTPUT);
     virtual void startup();
     virtual void shutdown();
-    virtual CoordValues<int16_t> getRawSensorValues();
+    virtual CoordValues<int16_t> getRawSensorValuesSync();
 
 protected:
     virtual void _changeMode(uint8_t mode);

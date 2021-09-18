@@ -17,7 +17,7 @@ public:
     void startup();
     void shutdown();
     uint8_t whoAmI() const;
-    CoordValues<int16_t> getRawSensorValues();
+    CoordValues<int16_t> getRawSensorValuesSync();
 
 private:
     I2C *_auxSerial;

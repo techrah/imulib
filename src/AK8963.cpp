@@ -112,14 +112,13 @@ void AK8963::shutdown()
     _changeMode(MODE_POWER_DOWN);
 }
 
-CoordValues<int16_t> AK8963::getRawSensorValues()
+CoordValues<int16_t> AK8963::getRawSensorValuesSync()
 {
     for (;;)
     {
         for (;;)
         {
             uint8_t st1 = _serial->readReg(ST1);
-            // _logger->log("ST1: 0x%02x", st1);
             if ((st1 & DRDY) == DRDY_READY)
             {
                 break;
