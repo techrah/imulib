@@ -21,7 +21,6 @@ namespace serial
             printf("\r\n");
         }
     };
-
 };
 
 #endif

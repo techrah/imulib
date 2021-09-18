@@ -2,6 +2,7 @@
 #define __A65E8222_D7CE_4904_BDB9_41B3E9028F88__
 
 #include "ICSerial.hpp"
+#include "serial/NullLogger.hpp"
 
 class AK8963 : public ICSerial
 {
@@ -91,7 +92,7 @@ public:
     };
 
 public:
-    AK8963(ISerial *const serial, Logger *const logger = new Logger());
+    AK8963(ISerial *const serial, ILogger *const logger = new NullLogger());
     virtual ~AK8963();
     virtual uint8_t whoAmI() const;
     virtual bool selfTest(struct SelfTestResults *out = nullptr, enum CNTL1Flags bitFlag = BIT_16_BIT_OUTPUT);

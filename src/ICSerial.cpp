@@ -2,7 +2,7 @@
 #include "serial/util.hpp"
 #include "exceptions.hpp"
 
-ICSerial::ICSerial(ISerial *const serial, Logger *const logger)
+ICSerial::ICSerial(ISerial *const serial, ILogger *const logger)
     : _serial(serial), _logger(logger)
 {
 }

@@ -7,8 +7,8 @@ const uint8_t SlvSerial::I2C_SLV_REG[] = {0x26, 0x29, 0x2C, 0x2F, 0x32};
 const uint8_t SlvSerial::I2C_SLV_CTRL[] = {0x27, 0x2A, 0x2D, 0x30, 0x34};
 const uint8_t SlvSerial::I2C_SLV_DO[] = {0x63, 0x64, 0x65, 0x66, 0x33};
 
-SlvSerial::SlvSerial(uint8_t deviceAddr, serial::ISerial *serial)
-    : _deviceAddr(deviceAddr), _serial(serial)
+SlvSerial::SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *logger)
+    : _deviceAddr(deviceAddr), _serial(serial), _logger(logger)
 {
 }
 
@@ -30,7 +30,7 @@ SlvConnection SlvSerial::_addConnection(uint8_t reg, uint8_t count)
     }
 
     // save connection
-    printf("[add slv] slvno=%d, reg=0x%02x, count=%d, esd=0x%02x\r\n", nextSlvNo, reg, count, nextEsd);
+    _logger->log("[add slv] slvno=%d, reg=0x%02x, count=%d, esd=0x%02x", nextSlvNo, reg, count, nextEsd);
     SlvConnection conn = {nextSlvNo, reg, count, nextEsd};
     _slvConnections.push_back(conn);
 

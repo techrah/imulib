@@ -3,7 +3,7 @@
 #include "exceptions.hpp"
 #include "serial/util.hpp"
 
-AK8963::AK8963(ISerial *const serial, Logger *const logger)
+AK8963::AK8963(ISerial *const serial, ILogger *const logger)
     : ICSerial(serial, logger)
 {
     validateDeviceId(_deviceId, "AK8963");

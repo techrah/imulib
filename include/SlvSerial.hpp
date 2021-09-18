@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "serial/ISerial.hpp"
+#include "serial/ILogger.hpp"
+#include "serial/NullLogger.hpp"
 
 using namespace serial;
 
@@ -74,7 +76,7 @@ public:
     static const uint8_t I2C_SLV4_DI = 0x35;
 
 public:
-    SlvSerial(uint8_t deviceAddr, serial::ISerial *serial);
+    SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *logger = new NullLogger());
     void setSlvForRead(uint8_t slvno, enum ExtSensData esd, int reg, uint8_t count);
     void setEsdInitialDelay(unsigned long delayMs) { _esdInitialDelay = delayMs; };
     virtual void writeReg(uint8_t reg, uint8_t data);
@@ -89,6 +91,7 @@ private:
 private:
     uint8_t _deviceAddr;
     ISerial *_serial;
+    ILogger *_logger;
     std::vector<SlvConnection> _slvConnections;
     unsigned long _esdInitialDelay = 30;
 };

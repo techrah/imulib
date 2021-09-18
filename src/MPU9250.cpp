@@ -19,7 +19,7 @@ MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, Logger *const logg
         _serial->writeReg(0x6A, 0x20); // enable master mode (USER_CTL)
         _serial->writeReg(0x24, 0x07); // set clock speed 267 kHz (I2C_MST_CTRL)
 
-        _mag = new AK8963(new SlvSerial(0x0C, _serial), _logger);
+        _mag = new AK8963(new SlvSerial(0x0C, _serial, _logger), _logger);
     }
 }
 

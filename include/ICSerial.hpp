@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include "serial/ISerial.hpp"
-#include "serial/Logger.hpp"
+#include "serial/ILogger.hpp"
+#include "serial/NullLogger.hpp"
 #include "CoordValues.hpp"
 
 using namespace serial;
@@ -11,7 +12,7 @@ using namespace serial;
 class ICSerial
 {
 public:
-    ICSerial(ISerial *const serial, Logger *const logger = new Logger());
+    ICSerial(ISerial *const serial, ILogger *const logger = new NullLogger());
     virtual ~ICSerial();
     virtual uint8_t whoAmI() const = 0;
     virtual void validateDeviceId(uint8_t deviceId, const char *name) const;
@@ -21,7 +22,7 @@ public:
 
 protected:
     ISerial *const _serial;
-    Logger *const _logger;
+    ILogger *const _logger;
 };
 
 #endif
