@@ -12,12 +12,12 @@ template <typename T>
 class CoordValues
 {
 public:
-    T operator[](int ix) const
+    T operator[](uint8_t ix) const
     {
         _validateIx(ix);
         return _data[ix];
     }
-    T &operator[](int ix)
+    T &operator[](uint8_t ix)
     {
         _validateIx(ix);
         return _data[ix];
@@ -110,9 +110,9 @@ public:
 protected:
     vector<T> _data;
 
-    void _validateIx(int ix) const
+    void _validateIx(uint8_t ix) const
     {
-        if (ix < 0 || ix >= _data.size())
+        if (ix >= _data.size())
         {
             throw std::out_of_range("std::vector index out of bounds");
         }

@@ -6,12 +6,14 @@
 #include <wiringPiSPI.h>
 #include "../ISerial.hpp"
 #include "../exceptions.hpp"
+#include "../util.hpp"
 
 namespace serial
 {
     class SPI : public ISerial
     {
-    private:
+    protected:
+        static const uint8_t READ_FLAG = 0b10000000;
         int _fd;
         int _channel;
 
@@ -36,28 +38,31 @@ namespace serial
         inline virtual uint8_t readReg(uint8_t reg)
         {
             uint8_t tmp[] = {reg, 0};
-            readReg(reg, tmp, 2);
+            _readReg(reg, tmp, 2);
             return tmp[1];
         }
         virtual Bytes readReg(uint8_t reg, uint8_t count)
         {
             Bytes out(count, 1);
-            readReg(reg, out.dataBuf(), count + 1);
+            _readReg(reg, out.dataBuf(), count + 1);
             return out;
         }
         virtual ~SPI(){};
 
-    private:
-        void readReg(uint8_t reg, uint8_t *out, uint8_t count)
+    protected:
+        void _readReg(uint8_t reg, uint8_t *out, uint8_t count)
         {
-            if (count == 1)
+            if (count > 0)
             {
-                out[0] = readReg(reg);
-            }
-            else
-            {
-                out[0] = 0x80 | reg;
-                wiringPiSPIDataRW(_channel, out, count);
+                if (count == 1)
+                {
+                    out[0] = readReg(reg);
+                }
+                else
+                {
+                    out[0] = READ_FLAG | reg;
+                    wiringPiSPIDataRW(_channel, out, count);
+                }
             }
         }
     };

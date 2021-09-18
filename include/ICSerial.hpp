@@ -16,7 +16,7 @@ public:
     virtual ~ICSerial();
     virtual uint8_t whoAmI() const = 0;
     virtual void validateDeviceId(uint8_t deviceId, const char *name) const;
-    virtual void startup() = 0;
+    // virtual void startup() = 0;
     virtual void shutdown() = 0;
     virtual CoordValues<int16_t> getRawSensorValuesSync() = 0;
 
