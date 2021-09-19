@@ -7,7 +7,6 @@
 
 namespace serial
 {
-
     class Bytes
     {
     private:
@@ -44,7 +43,7 @@ namespace serial
         {
             if (ix > _maxIx)
             {
-                throw new IndexException();
+                throw IndexException();
             }
         }
     };
