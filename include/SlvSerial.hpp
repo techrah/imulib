@@ -77,13 +77,13 @@ public:
 
 public:
     SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *logger = new NullLogger());
-    void setSlvForRead(uint8_t slvno, enum ExtSensData esd, int reg, uint8_t count);
     void setEsdInitialDelay(unsigned long delayMs) { _esdInitialDelay = delayMs; };
     virtual void writeReg(uint8_t reg, uint8_t data);
     virtual uint8_t readReg(uint8_t reg);
     virtual Bytes readReg(uint8_t reg, uint8_t count);
 
 private:
+    void _setSlvForRead(const SlvConnection &conn);
     SlvConnection _addConnection(uint8_t reg, uint8_t count);
     SlvConnection _getConnection(uint8_t reg, uint8_t count);
     void _clearAllConnections();
@@ -93,7 +93,7 @@ private:
     ISerial *_serial;
     ILogger *_logger;
     std::vector<SlvConnection> _slvConnections;
-    unsigned long _esdInitialDelay = 30;
+    unsigned long _esdInitialDelay = 1;
 };
 
 struct SlvConnection
