@@ -3,21 +3,21 @@
 
 #include "MPU65xx.hpp"
 #include "serial/I2C.hpp"
+#include "serial/NullLogger.hpp"
 
 class MPU9250 : public MPU65xx
 {
 public:
     MPU9250(ISerial *const serial,
             I2C *const auxSerial = nullptr,
-            Logger *const logger = new Logger());
+            ILogger *const logger = new NullLogger());
     MPU9250(const MPU9250 &) = delete;
     MPU9250 &operator=(const MPU9250 &) = delete;
     virtual ~MPU9250();
     void selfTest(struct AK8963::SelfTestResults *magTestResults = nullptr);
-    void startup();
+    bool startup();
     void shutdown();
     uint8_t whoAmI() const;
-    CoordValues<int16_t> getRawSensorValuesSync();
     AK8963 *getMag() { return _mag; }
 
 private:

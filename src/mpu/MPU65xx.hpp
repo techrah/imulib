@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "serial/ISerial.hpp"
-#include "serial/Logger.hpp"
+#include "serial/NullLogger.hpp"
 #include "ICSerial.hpp"
 #include "AK8963.hpp"
 
@@ -12,12 +12,11 @@ using namespace serial;
 class MPU65xx : public ICSerial
 {
 public:
-    MPU65xx(ISerial *const serial, Logger *const logger = new Logger());
+    MPU65xx(ISerial *const serial, ILogger *const logger = new NullLogger());
     ~MPU65xx();
-    void startup();
+    bool startup();
     void shutdown();
     uint8_t whoAmI() const;
-    CoordValues<int16_t> getRawSensorValuesSync();
 };
 
 #endif

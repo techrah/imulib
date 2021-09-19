@@ -2,7 +2,7 @@
 #include "serial/util.hpp"
 #include "SlvSerial.hpp"
 
-MPU65xx::MPU65xx(ISerial *const serial, Logger *const logger)
+MPU65xx::MPU65xx(ISerial *const serial, ILogger *const logger)
     : ICSerial(serial, logger)
 {
     // reset
@@ -12,8 +12,9 @@ MPU65xx::MPU65xx(ISerial *const serial, Logger *const logger)
     serial::delay(10); // needs time to reset
 }
 
-void MPU65xx::startup()
+bool MPU65xx::startup()
 {
+    return true;
 }
 
 void MPU65xx::shutdown()
@@ -29,9 +30,4 @@ MPU65xx::~MPU65xx()
 uint8_t MPU65xx::whoAmI() const
 {
     return _serial->readReg(0x75);
-}
-
-CoordValues<int16_t> MPU65xx::getRawSensorValuesSync()
-{
-    return CoordValues<int16_t>();
 }

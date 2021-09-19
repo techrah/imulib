@@ -1,12 +1,15 @@
 #include "MPU9250.hpp"
 #include "serial/util.hpp"
 #include "SlvSerial.hpp"
-#include "exceptions.hpp"
 
-MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, Logger *const logger)
+MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, ILogger *const logger)
     : MPU65xx(serial, logger), _auxSerial(auxSerial)
 {
-    validateDeviceId(_deviceId, "MPU-9250");
+    if (!validateDeviceId(_deviceId, "MPU-9250"))
+    {
+        // TODO: handle error
+        return;
+    }
 
     // Reset
     _serial->writeReg(0x6B, 0x80);
@@ -36,9 +39,9 @@ void MPU9250::selfTest(struct AK8963::SelfTestResults *magTestResults)
     _mag->selfTest(magTestResults);
 }
 
-void MPU9250::startup()
+bool MPU9250::startup()
 {
-    _mag->startup();
+    return _mag->startup();
 }
 
 void MPU9250::shutdown()
@@ -58,9 +61,4 @@ void MPU9250::shutdown()
 uint8_t MPU9250::whoAmI() const
 {
     return _serial->readReg(0x75);
-}
-
-CoordValues<int16_t> MPU9250::getRawSensorValuesSync()
-{
-    return _mag->getRawSensorValuesSync();
 }

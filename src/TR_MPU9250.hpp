@@ -1,0 +1,6 @@
+#ifndef __A654C819_C7F6_48CD_91ED_B67ECBF666A1__
+#define __A654C819_C7F6_48CD_91ED_B67ECBF666A1__
+
+#include "mpu/MPU9250.hpp"
+
+#endif

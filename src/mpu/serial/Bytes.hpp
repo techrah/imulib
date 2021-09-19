@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "exceptions.hpp"
+// #include "exceptions.hpp"
 
 namespace serial
 {
@@ -26,25 +26,20 @@ namespace serial
         uint8_t operator[](uint8_t ix) const
         {
             uint8_t newIx = ix + _offset;
-            _validateIndex(newIx);
             return _data[newIx];
         }
         uint8_t &operator[](uint8_t ix)
         {
             uint8_t newIx = ix + _offset;
-            _validateIndex(newIx);
             return _data[newIx];
         }
         // direct access (unsafe)
         uint8_t *dataBuf() { return _data; }
 
     private:
-        inline void _validateIndex(uint8_t ix) const
+        inline bool _validateIndex(uint8_t ix) const
         {
-            if (ix > _maxIx)
-            {
-                throw IndexException();
-            }
+            return ix <= _maxIx;
         }
     };
 }

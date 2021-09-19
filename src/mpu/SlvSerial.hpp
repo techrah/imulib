@@ -1,7 +1,6 @@
 #ifndef __A59C779E_15A0_4B27_B24D_DD19C551A89C__
 #define __A59C779E_15A0_4B27_B24D_DD19C551A89C__
 
-#include <vector>
 #include "serial/ISerial.hpp"
 #include "serial/ILogger.hpp"
 #include "serial/NullLogger.hpp"
@@ -77,6 +76,7 @@ public:
 
 public:
     SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *logger = new NullLogger());
+    virtual ~SlvSerial();
     void setEsdInitialDelay(unsigned long delayMs) { _esdInitialDelay = delayMs; };
     virtual void writeReg(uint8_t reg, uint8_t data);
     virtual uint8_t readReg(uint8_t reg);
@@ -92,7 +92,8 @@ private:
     uint8_t _deviceAddr;
     ISerial *_serial;
     ILogger *_logger;
-    std::vector<SlvConnection> _slvConnections;
+    SlvConnection *_slvConnections;
+    uint8_t _numConn = 0;
     unsigned long _esdInitialDelay = 1;
 };
 

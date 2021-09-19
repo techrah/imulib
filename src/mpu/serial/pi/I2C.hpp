@@ -25,11 +25,11 @@ namespace serial
             _fd = open(port, O_RDWR);
             if (_fd < 0)
             {
-                throw SerialException(0, string_format("Failed to initialize I2C serial connumications for port %s", port));
+                // throw SerialException(0, string_format("Failed to initialize I2C serial connumications for port %s", port));
             }
             if (ioctl(_fd, I2C_SLAVE, deviceAddr) < 0)
             {
-                throw SerialException(0, string_format("Failed to initialize I2C serial connumications for device at address 0x%02X", deviceAddr));
+                // throw SerialException(0, string_format("Failed to initialize I2C serial connumications for device at address 0x%02X", deviceAddr));
             };
         };
         virtual void writeReg(uint8_t reg, uint8_t data)
@@ -53,12 +53,12 @@ namespace serial
     private:
         void _readReg(uint8_t reg, uint8_t *out, uint8_t count)
         {
-            for (int i = 0; i < count; i++)
+            for (unsigned i = 0; i < count; i++)
             {
                 int res = i2c_smbus_read_byte_data(_fd, reg + i);
                 if (res < 0)
                 {
-                    throw SerialException(res, string_format("Serial read error (reg 0x%02X, count %d)", reg, count));
+                    // throw SerialException(res, string_format("Serial read error (reg 0x%02X, count %d)", reg, count));
                 }
                 out[i] = static_cast<uint8_t>(res);
             }

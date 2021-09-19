@@ -1,4 +1,3 @@
-#include <algorithm>
 #include "SlvSerial.hpp"
 #include "serial/util.hpp"
 
@@ -10,8 +9,16 @@ const uint8_t SlvSerial::I2C_SLV_CTRL[] = {0x27, 0x2A, 0x2D, 0x30};
 const uint8_t SlvSerial::I2C_SLV_DO[] = {0x63, 0x64, 0x65, 0x66};
 
 SlvSerial::SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *logger)
-    : _deviceAddr(deviceAddr), _serial(serial), _logger(logger)
+    : _deviceAddr(deviceAddr),
+      _serial(serial),
+      _logger(logger),
+      _slvConnections(new SlvConnection[sizeof(I2C_SLV_ADDR)])
 {
+}
+
+SlvSerial::~SlvSerial()
+{
+    delete _slvConnections;
 }
 
 SlvConnection SlvSerial::_addConnection(uint8_t reg, uint8_t count)
@@ -19,56 +26,53 @@ SlvConnection SlvSerial::_addConnection(uint8_t reg, uint8_t count)
     uint8_t nextSlvNo = 0;
     ExtSensData nextEsd = EXT_SENS_DATA_00;
 
-    if (_slvConnections.size() == sizeof(I2C_SLV_ADDR))
+    if (_numConn == sizeof(I2C_SLV_ADDR))
     {
         _clearAllConnections();
     }
 
-    if (!_slvConnections.empty())
+    if (_numConn > 0)
     {
-        SlvConnection last = _slvConnections.back();
+        SlvConnection last = _slvConnections[_numConn - 1];
         nextSlvNo = last.slvno + 1;
         nextEsd = static_cast<ExtSensData>(last.esd + last.count);
     }
 
     // save connection
     SlvConnection conn = {nextSlvNo, reg, count, nextEsd};
-    _slvConnections.push_back(conn);
+    _slvConnections[_numConn++] = conn;
 
     _setSlvForRead(conn);
-
     return conn;
 }
 
 SlvConnection SlvSerial::_getConnection(uint8_t reg, uint8_t count)
 {
-    auto is_match = [reg, count](SlvConnection c)
-    { return c.reg == reg && c.count == count; };
-
-    auto conn = std::find_if(_slvConnections.begin(), _slvConnections.end(), is_match);
+    for (unsigned i = 0; i < _numConn; i++)
     {
-        if (conn != std::end(_slvConnections))
+        SlvConnection conn = _slvConnections[i];
+        if (conn.reg == reg && conn.count == count)
         {
-            return *conn;
+            return conn;
         }
-        return _addConnection(reg, count);
     }
+    return _addConnection(reg, count);
 }
 
 void SlvSerial::_clearAllConnections()
 {
-    for (auto &conn : _slvConnections)
+    for (unsigned i = 0; i < _numConn; i++)
     {
+        SlvConnection conn = _slvConnections[i];
         _serial->writeReg(I2C_SLV_ADDR[conn.slvno], _deviceAddr);
         _serial->writeReg(I2C_SLV_REG[conn.slvno], conn.reg);
         _serial->writeReg(I2C_SLV_CTRL[conn.slvno], 0x00); // disable
     }
-    _slvConnections.clear();
+    _numConn = 0;
 }
 
 void SlvSerial::writeReg(uint8_t reg, uint8_t data)
 {
-    _logger->log(TAG, "[write] reg=0x%02x, data=0x%02x", reg, data);
     // Use SLV4 since it doesn't affect EXT_SENS_DATA_nn registers
     _serial->writeReg(I2C_SLV4_ADDR, _deviceAddr);
     _serial->writeReg(I2C_SLV4_REG, reg);
@@ -89,7 +93,15 @@ serial::Bytes SlvSerial::readReg(uint8_t reg, uint8_t count)
 
 void SlvSerial::_setSlvForRead(const SlvConnection &conn)
 {
-    _logger->log(TAG, "[read] slvno=%d, reg=0x%02x, count=%d, esd=0x%02x", conn.slvno, conn.reg, conn.count, conn.esd);
+    _logger->print(TAG, "[new conn] slnvo=");
+    _logger->print(NULL, conn.slvno);
+    _logger->print(NULL, ", reg=0x");
+    _logger->print(NULL, conn.reg, ILogger::Format::hex);
+    _logger->print(NULL, ", count=");
+    _logger->print(NULL, conn.count);
+    _logger->print(NULL, ", esd=0x");
+    _logger->println(NULL, conn.esd, ILogger::Format::hex);
+
     _serial->writeReg(I2C_SLV_ADDR[conn.slvno], I2C_SLV_READ | _deviceAddr);
     _serial->writeReg(I2C_SLV_REG[conn.slvno], conn.reg);
     _serial->writeReg(I2C_SLV_CTRL[conn.slvno], I2C_SLV_EN | conn.count);

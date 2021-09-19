@@ -23,7 +23,7 @@ namespace serial
             _fd = wiringPiSPISetup(channel, speed);
             if (_fd < 0)
             {
-                throw SerialException(0, string_format("Failed to initialize SPI serial connumications for channel %d", channel));
+                // throw SerialException(0, string_format("Failed to initialize SPI serial connumications for channel %d", channel));
             }
         }
         virtual void setMode(uint8_t mode)
