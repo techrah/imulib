@@ -69,7 +69,7 @@ CoordValues<int16_t> AK8963::_xyzBytesToInts(const Bytes &data) const
     });
 }
 
-CoordValues<float> AK8963::_getSensitivityMultiplierValues()
+std::vector<float> AK8963::_getSensitivityMultiplierValues()
 {
     _changeMode(MODE_FUSE_ROM_ACCESS);
     Bytes b = _serial->readReg(ASAX, 3);
@@ -81,12 +81,11 @@ CoordValues<float> AK8963::_getSensitivityMultiplierValues()
         return (val - 128) / 256.0f + 1;
     };
 
-    CoordValues<float> r({
+    return std::vector<float>({
         calcMultiplier(b[0]),
         calcMultiplier(b[1]),
         calcMultiplier(b[2]),
     });
-    return r;
 }
 
 bool AK8963::selfTest(struct SelfTestResults *out)
@@ -101,7 +100,7 @@ bool AK8963::selfTest(struct SelfTestResults *out)
     _changeMode(MODE_POWER_DOWN);
 
     CoordValues<float> fv(values);
-    fv *= smv.data();
+    fv *= smv;
 
     const float *ranges = _bitOutput == BIT_16_BIT_OUTPUT ? normalRanges16 : normalRanges14;
     bool pass = fv[0] >= ranges[0] && fv[0] <= ranges[1] &&
@@ -126,6 +125,8 @@ void AK8963::startup(enum CNTL1FlagsMode mode)
     assert(mode & (MODE_SINGLE_MEASUREMENT |
                    MODE_CONTINUOUS_MEASUREMENT_1_8HZ |
                    MODE_CONTINUOUS_MEASUREMENT_2_100HZ));
+
+    _sensitivity = _getSensitivityMultiplierValues();
 
     for (;;)
     {
@@ -178,4 +179,30 @@ CoordValues<int16_t> AK8963::getSingleRawSensorValuesSync()
 {
     startup(MODE_SINGLE_MEASUREMENT);
     return getRawSensorValuesSync();
+}
+
+void AK8963::setBitOutput(enum CNTL1FlagsBitOutput bitOutput)
+{
+    static float maxMicroTesla = 4912;
+    static float maxRange_14bit = 8190;
+    static float maxRange_16bit = 32760;
+
+    _bitOutput = bitOutput;
+
+    switch (bitOutput)
+    {
+    case BIT_14_BIT_OUTPUT:
+        _scaleFactor = maxMicroTesla / maxRange_14bit;
+        break;
+    case BIT_16_BIT_OUTPUT:
+        _scaleFactor = maxMicroTesla / maxRange_16bit;
+        break;
+    default:;
+    }
+}
+
+CoordValues<float> AK8963::getSensorValues()
+{
+    CoordValues<float> rawValues = getRawSensorValuesSync();
+    return rawValues * _sensitivity * _scaleFactor;
 }

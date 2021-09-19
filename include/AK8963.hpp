@@ -102,20 +102,30 @@ public:
     virtual bool selfTest(struct SelfTestResults *out = nullptr);
     virtual void startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
     virtual void shutdown();
+
+    // Must call startup() first
     virtual CoordValues<int16_t> getRawSensorValuesSync();
+    virtual CoordValues<float> getSensorValues();
+
+    // Use single-reading mode
+    // Do not call startup()
+    // Keep AK8963 instance between calls to prevent CNTL2 soft resets
     virtual CoordValues<int16_t> getSingleRawSensorValuesSync();
-    virtual void setBitOutput(enum CNTL1FlagsBitOutput bitOutput) { _bitOutput = bitOutput; }
+
+    virtual void setBitOutput(enum CNTL1FlagsBitOutput bitOutput);
     virtual const enum CNTL1FlagsBitOutput getBitOutput() const { return _bitOutput; }
 
 protected:
     virtual void _changeMode(enum CNTL1FlagsMode mode);
     CoordValues<int16_t> _xyzBytesToInts(const Bytes &bytes) const;
-    CoordValues<float> _getSensitivityMultiplierValues();
+    std::vector<float> _getSensitivityMultiplierValues();
 
 protected:
     static const uint8_t _deviceId = 0x48;
     enum CNTL1FlagsBitOutput _bitOutput = BIT_16_BIT_OUTPUT;
+    float _scaleFactor = 4192.0f / 32760;
     enum CNTL1FlagsMode _currentMode = MODE_POWER_DOWN; // init to non-existing mode
+    std::vector<float> _sensitivity;
 };
 
 #endif

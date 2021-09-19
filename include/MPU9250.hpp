@@ -18,6 +18,7 @@ public:
     void shutdown();
     uint8_t whoAmI() const;
     CoordValues<int16_t> getRawSensorValuesSync();
+    AK8963 *getMag() { return _mag; }
 
 private:
     I2C *_auxSerial;
