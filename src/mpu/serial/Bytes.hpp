@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-// #include "exceptions.hpp"
+#include <assert.h>
 
 namespace serial
 {
@@ -25,11 +25,13 @@ namespace serial
         virtual ~Bytes() { delete _data; }
         uint8_t operator[](uint8_t ix) const
         {
+            assert(ix <= _maxIx);
             uint8_t newIx = ix + _offset;
             return _data[newIx];
         }
         uint8_t &operator[](uint8_t ix)
         {
+            assert(ix <= _maxIx);
             uint8_t newIx = ix + _offset;
             return _data[newIx];
         }

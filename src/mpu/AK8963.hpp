@@ -1,6 +1,8 @@
 #ifndef __A65E8222_D7CE_4904_BDB9_41B3E9028F88__
 #define __A65E8222_D7CE_4904_BDB9_41B3E9028F88__
 
+#include <stdint.h>
+#include <errno.h>
 #include "ICSerial.hpp"
 #include "serial/NullLogger.hpp"
 
@@ -95,12 +97,20 @@ public:
         bool pass;
     };
 
+    struct Config
+    {
+        CoordValues<int8_t> asa;
+        CoordValues<int8_t> offset;
+        Config() : asa(3), offset(3){};
+    };
+
 public:
-    AK8963(ISerial *const serial, ILogger *const logger = new NullLogger());
+    AK8963(ISerial *const, ILogger *const = new NullLogger());
+    AK8963(ISerial *const, const Config &, ILogger *const = new NullLogger());
     virtual ~AK8963();
     virtual uint8_t whoAmI() const;
     virtual bool selfTest(struct SelfTestResults *out = nullptr);
-    virtual bool startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
+    virtual error_t startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
     virtual void shutdown();
 
     // Must call startup() first
@@ -121,14 +131,16 @@ public:
 protected:
     virtual void _changeMode(enum CNTL1FlagsMode mode);
     CoordValues<int16_t> _xyzBytesToInts(const Bytes &bytes) const;
-    CoordValues<float> _getSensitivityMultiplierValues();
+    void _retrieveSensitivityValues();
+    void _computeSensitivityMultipliers();
 
 protected:
     static const uint8_t _deviceId = 0x48;
     enum CNTL1FlagsBitOutput _bitOutput = BIT_16_BIT_OUTPUT;
     float _scaleFactor = 4192.0f / 32760;
     enum CNTL1FlagsMode _currentMode = MODE_POWER_DOWN; // init to non-existing mode
-    CoordValues<float> _sensitivity;
+    Config _config;
+    CoordValues<float> *_sensitivity = nullptr;
 };
 
 #endif

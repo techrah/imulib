@@ -10,14 +10,14 @@ class CoordValues
 public:
     T operator[](uint8_t ix) const
     {
-        if (_validateIx(ix))
-            return _data[ix];
+        assert(ix < _size);
+        return _data[ix];
     }
 
     T &operator[](uint8_t ix)
     {
-        if (_validateIx(ix))
-            return _data[ix];
+        assert(ix < _size);
+        return _data[ix];
     }
 
     CoordValues<T>(uint8_t size) : _data(new T[size]), _size(size) {}
@@ -59,11 +59,22 @@ public:
     // move assign
     CoordValues<T> &operator=(CoordValues<T> &&rhs)
     {
-        if (this != &rhs)
+        if (this != &rhs &&_size = rhs._size)
         {
             _data = rhs._data;
-            _size = rhs._size;
             rhs._data = nullptr;
+        }
+        return *this;
+    }
+
+    // ex: v = (const int[]){175, 175, 164};
+    // Unsafe! array on RHS should have same number of elements
+    template <typename U>
+    CoordValues<T> &operator=(const U values[])
+    {
+        for (int i = 0; i < _size; i++)
+        {
+            _data[i] = static_cast<T>(values[i]);
         }
         return *this;
     }
@@ -137,11 +148,6 @@ public:
 protected:
     T *_data;
     uint8_t _size;
-
-    bool _validateIx(uint8_t ix) const
-    {
-        return ix < _size;
-    }
 };
 
 #endif

@@ -5,7 +5,6 @@
 #include <sys/ioctl.h>
 #include <wiringPiSPI.h>
 #include "../ISerial.hpp"
-#include "../exceptions.hpp"
 #include "../util.hpp"
 
 namespace serial

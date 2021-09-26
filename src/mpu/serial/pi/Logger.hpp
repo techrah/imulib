@@ -4,6 +4,7 @@
 #ifdef RASPI
 
 #include <stdio.h>
+#include <cstring>
 #include "../ILogger.hpp"
 
 #define HAS_TAG(TAG) ((TAG) && strlen((TAG)) > 0)
@@ -23,10 +24,30 @@ namespace serial
 
         void print(const char *TAG, int val, enum Format format = Format::dec)
         {
+            const char *fmt;
+            switch (format)
+            {
+            case Format::hex:
+                fmt = "%X";
+                break;
+            case Format::oct:
+                fmt = "%o";
+                break;
+            case Format::dec:
+            default:
+                fmt = "%d";
+            };
             if (HAS_TAG(TAG))
-                printf("[%s] %d", TAG, val);
+            {
+                char buf[100];
+                sprintf(buf, fmt, val);
+                buf[99] = '\0';
+                printf("[%s] %s", TAG, buf);
+            }
             else
-                printf("%d", val);
+            {
+                printf(fmt, val);
+            }
         }
 
         void print(const char *TAG, float val, int dp = 2)
@@ -47,10 +68,30 @@ namespace serial
 
         void println(const char *TAG, int val, enum Format format = Format::dec)
         {
+            const char *fmt;
+            switch (format)
+            {
+            case Format::hex:
+                fmt = "%X\r\n";
+                break;
+            case Format::oct:
+                fmt = "%o\r\n";
+                break;
+            case Format::dec:
+            default:
+                fmt = "%d\r\n";
+            };
             if (HAS_TAG(TAG))
-                printf("[%s] *\r\n", TAG, _getFormatCode(format), val);
+            {
+                char buf[100];
+                sprintf(buf, fmt, val);
+                buf[99] = '\0';
+                printf("[%s] %s", TAG, buf);
+            }
             else
-                printf("*\r\n", _getFormatCode(format), val);
+            {
+                printf(fmt, val);
+            }
         }
 
         void println(const char *TAG, float val, int dp = 2)

@@ -9,7 +9,6 @@ extern "C"
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include "../ISerial.hpp"
-#include "../exceptions.hpp"
 #include "../util.hpp"
 
 namespace serial

@@ -5,13 +5,20 @@
 static const char *TAG = "AK8963";
 
 AK8963::AK8963(ISerial *const serial, ILogger *const logger)
-    : ICSerial(serial, logger), _sensitivity(0)
+    : ICSerial(serial, logger)
 {
+}
+
+AK8963::AK8963(ISerial *const serial, const Config &config, ILogger *const logger)
+    : ICSerial(serial, logger), _config(config)
+{
+    _computeSensitivityMultipliers();
 }
 
 AK8963::~AK8963()
 {
     shutdown();
+    delete _sensitivity;
 }
 
 uint8_t AK8963::whoAmI() const
@@ -66,28 +73,42 @@ CoordValues<int16_t> AK8963::_xyzBytesToInts(const Bytes &data) const
     return res;
 }
 
-CoordValues<float> AK8963::_getSensitivityMultiplierValues()
+void AK8963::_retrieveSensitivityValues()
 {
     _changeMode(MODE_FUSE_ROM_ACCESS);
     Bytes b = _serial->readReg(ASAX, 3);
-    _logger->print(TAG, "ASAX:");
-    _logger->print(NULL, b[0]);
-    _logger->print(NULL, ", ASAY:");
-    _logger->print(NULL, b[1]);
-    _logger->print(NULL, ", ASAZ:");
-    _logger->println(NULL, b[2]);
 
+    CoordValues<int8_t> asa(3);
+    asa[0] = b[0];
+    asa[1] = b[1];
+    asa[2] = b[2];
+
+    _logger->print(TAG, "ASAX:");
+    _logger->print(NULL, asa[0]);
+    _logger->print(NULL, ", ASAY:");
+    _logger->print(NULL, asa[1]);
+    _logger->print(NULL, ", ASAZ:");
+    _logger->println(NULL, asa[2]);
+
+    _config.asa = asa;
+}
+
+void AK8963::_computeSensitivityMultipliers()
+{
     auto calcMultiplier = [](float val)
     {
         // AK8963 p32
         return (val - 128) / 256.0f + 1;
     };
 
-    CoordValues<float> res(3);
-    res[0] = calcMultiplier(b[0]);
-    res[1] = calcMultiplier(b[1]);
-    res[2] = calcMultiplier(b[2]);
-    return res;
+    if (!_sensitivity)
+    {
+        _sensitivity = new CoordValues<float>(3);
+    }
+
+    (*_sensitivity)[0] = calcMultiplier(_config.asa[0]);
+    (*_sensitivity)[1] = calcMultiplier(_config.asa[1]);
+    (*_sensitivity)[2] = calcMultiplier(_config.asa[2]);
 }
 
 bool AK8963::selfTest(struct SelfTestResults *out)
@@ -95,14 +116,15 @@ bool AK8963::selfTest(struct SelfTestResults *out)
     static const float normalRanges14[] = {-50, 50, -50, 50, -800, -200};
     static const float normalRanges16[] = {-200, 200, -200, 200, -3200, -800};
 
-    auto smv = _getSensitivityMultiplierValues();
+    _retrieveSensitivityValues();
+    _computeSensitivityMultipliers();
 
     _changeMode(MODE_SELF_TEST);
     auto values = getRawSensorValues();
     _changeMode(MODE_POWER_DOWN);
 
     CoordValues<float> fv = values;
-    fv *= smv;
+    fv *= *_sensitivity;
 
     const float *ranges = _bitOutput == BIT_16_BIT_OUTPUT ? normalRanges16 : normalRanges14;
     bool pass = fv[0] >= ranges[0] && fv[0] <= ranges[1] &&
@@ -111,7 +133,7 @@ bool AK8963::selfTest(struct SelfTestResults *out)
 
     if (out)
     {
-        out->sMult = smv;
+        out->sMult = *_sensitivity;
         out->measurements = values;
         out->adjusted = fv;
         out->pass = pass;
@@ -120,7 +142,7 @@ bool AK8963::selfTest(struct SelfTestResults *out)
     return pass;
 }
 
-bool AK8963::startup(enum CNTL1FlagsMode mode)
+error_t AK8963::startup(enum CNTL1FlagsMode mode)
 {
     static const uint64_t TRY_INTERVAL_MS = 1000;
 
@@ -135,12 +157,16 @@ bool AK8963::startup(enum CNTL1FlagsMode mode)
     }
     else
     {
-        return false;
+        return -1;
     }
 
-    _sensitivity = _getSensitivityMultiplierValues();
+    if (!_sensitivity)
+    {
+        _retrieveSensitivityValues();
+        _computeSensitivityMultipliers();
+    }
 
-    for (;;)
+    for (int i = 0; i < 3; i++)
     {
         uint64_t prevTime = getEpochTimeMs();
         _changeMode(mode);
@@ -152,16 +178,18 @@ bool AK8963::startup(enum CNTL1FlagsMode mode)
             if ((st1 & DRDY) == DRDY_READY)
             {
                 _logger->println(TAG, "Data ready");
-                return;
+                return 0;
             }
             if (getEpochTimeMs() - prevTime > TRY_INTERVAL_MS)
             {
                 break;
             }
+            serial::delay(10);
         }
     }
 
-    return true;
+    shutdown();
+    return -2;
 }
 
 void AK8963::shutdown()
@@ -218,6 +246,7 @@ void AK8963::setBitOutput(enum CNTL1FlagsBitOutput bitOutput)
 
 CoordValues<float> AK8963::getSensorValues()
 {
-    CoordValues<float> rawValues = getRawSensorValues();
-    return rawValues * _sensitivity * _scaleFactor;
+    assert(_sensitivity);
+    CoordValues<float> res = getRawSensorValues();
+    return res * *_sensitivity * _scaleFactor;
 }
