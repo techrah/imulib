@@ -5,7 +5,7 @@
 #include <string.h>
 
 template <typename T>
-class CoordValues
+class Values
 {
 public:
     T operator[](uint8_t ix) const
@@ -20,10 +20,10 @@ public:
         return _data[ix];
     }
 
-    CoordValues<T>(uint8_t size) : _data(new T[size]), _size(size) {}
+    Values<T>(uint8_t size) : _data(new T[size]), _size(size) {}
 
     // copy constructor
-    CoordValues<T>(const CoordValues<T> &rhs)
+    Values<T>(const Values<T> &rhs)
     {
         _data = new T[rhs._size];
         _size = rhs._size;
@@ -31,20 +31,20 @@ public:
     }
 
     // move constructor
-    CoordValues<T>(CoordValues<T> &&rhs)
+    Values<T>(Values<T> &&rhs)
     {
         _data = rhs._data;
         _size = rhs._size;
         rhs._data = nullptr;
     }
 
-    ~CoordValues()
+    ~Values()
     {
         delete _data;
     }
 
     // copy assign
-    CoordValues<T> &operator=(const CoordValues<T> &rhs)
+    Values<T> &operator=(const Values<T> &rhs)
     {
         if (this != &rhs)
         {
@@ -57,7 +57,7 @@ public:
     }
 
     // move assign
-    CoordValues<T> &operator=(CoordValues<T> &&rhs)
+    Values<T> &operator=(Values<T> &&rhs)
     {
         if (this != &rhs && _size == rhs._size)
         {
@@ -70,7 +70,7 @@ public:
     // ex: v = (const int[]){175, 175, 164};
     // Unsafe! array on RHS should have same number of elements
     template <typename U>
-    CoordValues<T> &operator=(const U values[])
+    Values<T> &operator=(const U values[])
     {
         for (int i = 0; i < _size; i++)
         {
@@ -81,9 +81,9 @@ public:
 
     // conversion operator for casting from type T to U
     template <typename U>
-    operator CoordValues<U>()
+    operator Values<U>()
     {
-        CoordValues<U> res(_size);
+        Values<U> res(_size);
         for (unsigned i = 0; i < _size; i++)
         {
             res[i] = static_cast<U>(_data[i]);
@@ -93,9 +93,9 @@ public:
 
     // {x, y, z} * n = {nx, ny, nz}
     template <typename U>
-    CoordValues<T> operator*(U scalar) const
+    Values<T> operator*(U scalar) const
     {
-        CoordValues<T> res(_size);
+        Values<T> res(_size);
         for (unsigned i = 0; i < _size; i++)
         {
             res[i] = _data[i] * static_cast<T>(scalar);
@@ -115,9 +115,9 @@ public:
 
     // {x, y, z} * {a, b, c} = {ax, by, cz}
     template <typename U>
-    CoordValues<T> operator*(const CoordValues<U> &multipliers)
+    Values<T> operator*(const Values<U> &multipliers)
     {
-        CoordValues<T> res(_size);
+        Values<T> res(_size);
         for (unsigned i = 0; i < _size; i++)
         {
             res[i] = _data[i] * static_cast<T>(multipliers[i]);
@@ -127,7 +127,7 @@ public:
 
     // {x, y, z} *= {a, b, c} => {ax, by, cz}
     template <typename U>
-    void operator*=(const CoordValues<U> &multipliers)
+    void operator*=(const Values<U> &multipliers)
     {
         for (unsigned i = 0; i < _size; i++)
         {
@@ -136,7 +136,7 @@ public:
     };
 
     template <typename Functor>
-    CoordValues<T> &apply(Functor &fn)
+    Values<T> &apply(Functor &fn)
     {
         for (unsigned i = 0; i < _size; i++)
         {

@@ -5,6 +5,7 @@
 #include <errno.h>
 #include "ICSerial.hpp"
 #include "serial/NullLogger.hpp"
+#include "Values.hpp"
 
 class AK8963 : public ICSerial
 {
@@ -91,16 +92,16 @@ public:
 
     struct SelfTestResults
     {
-        CoordValues<float> sMult; // sensitivity adjustment multiplier values
-        CoordValues<int16_t> measurements;
-        CoordValues<float> adjusted;
+        Values<float> sMult; // sensitivity adjustment multiplier values
+        Values<int16_t> measurements;
+        Values<float> adjusted;
         bool pass;
     };
 
     struct Config
     {
-        CoordValues<int8_t> asa;
-        CoordValues<int8_t> offset;
+        Values<int8_t> asa;
+        Values<int8_t> offset;
         Config() : asa(3), offset(3){};
     };
 
@@ -114,14 +115,14 @@ public:
     virtual void shutdown();
 
     // Must call startup() first
-    virtual CoordValues<int16_t> getRawSensorValues();
-    virtual CoordValues<float> getSensorValues();
+    virtual Values<int16_t> getRawSensorValues();
+    virtual Values<float> getSensorValues();
 
     // Use single-reading mode
     // Do not call startup()
     // TODO: add config data (ASAX/Y/Z) to constructor
     // and move init/reset code out of startup()
-    virtual CoordValues<int16_t> getSingleRawSensorValues();
+    virtual Values<int16_t> getSingleRawSensorValues();
 
     // Set bit output before calling startup
     virtual void setBitOutput(enum CNTL1FlagsBitOutput bitOutput);
@@ -130,7 +131,7 @@ public:
 
 protected:
     virtual void _changeMode(enum CNTL1FlagsMode mode);
-    CoordValues<int16_t> _xyzBytesToInts(const Bytes &bytes) const;
+    Values<int16_t> _bytesToInts(const Bytes &bytes) const;
     void _retrieveSensitivityValues();
     void _computeSensitivityMultipliers();
 
@@ -140,7 +141,7 @@ protected:
     float _scaleFactor = 4192.0f / 32760;
     enum CNTL1FlagsMode _currentMode = MODE_POWER_DOWN; // init to non-existing mode
     Config _config;
-    CoordValues<float> *_sensitivity = nullptr;
+    Values<float> *_sensitivity = nullptr;
 };
 
 #endif

@@ -60,13 +60,13 @@ void AK8963::_changeMode(enum CNTL1FlagsMode mode)
     }
 }
 
-CoordValues<int16_t> AK8963::_xyzBytesToInts(const Bytes &data) const
+Values<int16_t> AK8963::_bytesToInts(const Bytes &data) const
 {
     auto bytesToInt = [](uint8_t hByte, uint8_t lByte)
     {
         return static_cast<int16_t>(static_cast<uint16_t>(hByte) << 8 | lByte);
     };
-    CoordValues<int16_t> res(3);
+    Values<int16_t> res(3);
     res[0] = bytesToInt(data[1], data[0]);
     res[1] = bytesToInt(data[3], data[2]);
     res[2] = bytesToInt(data[5], data[4]);
@@ -78,7 +78,7 @@ void AK8963::_retrieveSensitivityValues()
     _changeMode(MODE_FUSE_ROM_ACCESS);
     Bytes b = _serial->readReg(ASAX, 3);
 
-    CoordValues<int8_t> asa(3);
+    Values<int8_t> asa(3);
     asa[0] = b[0];
     asa[1] = b[1];
     asa[2] = b[2];
@@ -103,7 +103,7 @@ void AK8963::_computeSensitivityMultipliers()
 
     if (!_sensitivity)
     {
-        _sensitivity = new CoordValues<float>(3);
+        _sensitivity = new Values<float>(3);
     }
 
     _sensitivity->apply(calcMultiplier);
@@ -121,7 +121,7 @@ bool AK8963::selfTest(struct SelfTestResults *out)
     auto values = getRawSensorValues();
     _changeMode(MODE_POWER_DOWN);
 
-    CoordValues<float> fv = values;
+    Values<float> fv = values;
     fv *= *_sensitivity;
 
     const float *ranges = _bitOutput == BIT_16_BIT_OUTPUT ? normalRanges16 : normalRanges14;
@@ -195,7 +195,7 @@ void AK8963::shutdown()
     _changeMode(MODE_POWER_DOWN);
 }
 
-CoordValues<int16_t> AK8963::getRawSensorValues()
+Values<int16_t> AK8963::getRawSensorValues()
 {
     for (;;)
     {
@@ -210,12 +210,12 @@ CoordValues<int16_t> AK8963::getRawSensorValues()
         Bytes data = _serial->readReg(HXL, 7);
         if ((data[6] & HOFL) == HOFL_NORMAL)
         {
-            return _xyzBytesToInts(data);
+            return _bytesToInts(data);
         }
     }
 }
 
-CoordValues<int16_t> AK8963::getSingleRawSensorValues()
+Values<int16_t> AK8963::getSingleRawSensorValues()
 {
     startup(MODE_SINGLE_MEASUREMENT);
     return getRawSensorValues();
@@ -242,9 +242,9 @@ void AK8963::setBitOutput(enum CNTL1FlagsBitOutput bitOutput)
     }
 }
 
-CoordValues<float> AK8963::getSensorValues()
+Values<float> AK8963::getSensorValues()
 {
     assert(_sensitivity);
-    CoordValues<float> res = getRawSensorValues();
+    Values<float> res = getRawSensorValues();
     return res * *_sensitivity * _scaleFactor;
 }

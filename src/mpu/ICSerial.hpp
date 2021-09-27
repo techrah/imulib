@@ -5,7 +5,6 @@
 #include "serial/ISerial.hpp"
 #include "serial/ILogger.hpp"
 #include "serial/NullLogger.hpp"
-#include "CoordValues.hpp"
 
 using namespace serial;
 
