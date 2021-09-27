@@ -59,7 +59,7 @@ public:
     // move assign
     CoordValues<T> &operator=(CoordValues<T> &&rhs)
     {
-        if (this != &rhs &&_size = rhs._size)
+        if (this != &rhs && _size == rhs._size)
         {
             _data = rhs._data;
             rhs._data = nullptr;
@@ -134,6 +134,16 @@ public:
             _data[i] *= static_cast<T>(multipliers[i]);
         }
     };
+
+    template <typename Functor>
+    CoordValues<T> &apply(Functor &fn)
+    {
+        for (unsigned i = 0; i < _size; i++)
+        {
+            _data[i] = fn(_data[i], i);
+        }
+        return *this;
+    }
 
     T *data() const
     {

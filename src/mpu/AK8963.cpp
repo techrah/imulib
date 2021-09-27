@@ -95,10 +95,10 @@ void AK8963::_retrieveSensitivityValues()
 
 void AK8963::_computeSensitivityMultipliers()
 {
-    auto calcMultiplier = [](float val)
+    auto calcMultiplier = [this](float val, int ix)
     {
         // AK8963 p32
-        return (val - 128) / 256.0f + 1;
+        return (_config.asa[ix] - 128) / 256.0f + 1;
     };
 
     if (!_sensitivity)
@@ -106,9 +106,7 @@ void AK8963::_computeSensitivityMultipliers()
         _sensitivity = new CoordValues<float>(3);
     }
 
-    (*_sensitivity)[0] = calcMultiplier(_config.asa[0]);
-    (*_sensitivity)[1] = calcMultiplier(_config.asa[1]);
-    (*_sensitivity)[2] = calcMultiplier(_config.asa[2]);
+    _sensitivity->apply(calcMultiplier);
 }
 
 bool AK8963::selfTest(struct SelfTestResults *out)
