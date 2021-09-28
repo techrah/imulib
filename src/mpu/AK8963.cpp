@@ -62,14 +62,15 @@ void AK8963::_changeMode(enum CNTL1FlagsMode mode)
 
 Values<int16_t> AK8963::_bytesToInts(const Bytes &data) const
 {
-    auto bytesToInt = [](uint8_t hByte, uint8_t lByte)
+    auto bytesToInt = [&data](int16_t value, int ix)
     {
+        uint8_t hByte = data[ix * 2 + 1];
+        uint8_t lByte = data[ix * 2];
         return static_cast<int16_t>(static_cast<uint16_t>(hByte) << 8 | lByte);
     };
+
     Values<int16_t> res(3);
-    res[0] = bytesToInt(data[1], data[0]);
-    res[1] = bytesToInt(data[3], data[2]);
-    res[2] = bytesToInt(data[5], data[4]);
+    res.apply(bytesToInt);
     return res;
 }
 
@@ -77,20 +78,14 @@ void AK8963::_retrieveSensitivityValues()
 {
     _changeMode(MODE_FUSE_ROM_ACCESS);
     Bytes b = _serial->readReg(ASAX, 3);
-
-    Values<int8_t> asa(3);
-    asa[0] = b[0];
-    asa[1] = b[1];
-    asa[2] = b[2];
+    _config.asa = b.dataBuf();
 
     _logger->print(TAG, "ASAX:");
-    _logger->print(NULL, asa[0]);
+    _logger->print(NULL, _config.asa[0]);
     _logger->print(NULL, ", ASAY:");
-    _logger->print(NULL, asa[1]);
+    _logger->print(NULL, _config.asa[1]);
     _logger->print(NULL, ", ASAZ:");
-    _logger->println(NULL, asa[2]);
-
-    _config.asa = asa;
+    _logger->println(NULL, _config.asa[2]);
 }
 
 void AK8963::_computeSensitivityMultipliers()
@@ -107,6 +102,12 @@ void AK8963::_computeSensitivityMultipliers()
     }
 
     _sensitivity->apply(calcMultiplier);
+    _logger->print(TAG, "Sensitivity multipliers: mx=");
+    _logger->print(NULL, (*_sensitivity)[0]);
+    _logger->print(NULL, ", my=");
+    _logger->print(NULL, (*_sensitivity)[1]);
+    _logger->print(NULL, ", mz=");
+    _logger->println(NULL, (*_sensitivity)[2]);
 }
 
 bool AK8963::selfTest(struct SelfTestResults *out)

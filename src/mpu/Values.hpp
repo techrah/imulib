@@ -8,33 +8,36 @@ template <typename T>
 class Values
 {
 public:
-    T operator[](uint8_t ix) const
+    inline T operator[](uint8_t ix) const
     {
         assert(ix < _size);
         return _data[ix];
     }
 
-    T &operator[](uint8_t ix)
+    inline T &operator[](uint8_t ix)
     {
         assert(ix < _size);
         return _data[ix];
     }
 
-    Values<T>(uint8_t size) : _data(new T[size]), _size(size) {}
+    Values<T>(uint8_t size) : _size(size), _data(new T[size]) {}
+
+    template <typename U>
+    Values<T>(uint8_t size, const U values[]);
 
     // copy constructor
     Values<T>(const Values<T> &rhs)
     {
-        _data = new T[rhs._size];
         _size = rhs._size;
+        _data = new T[_size];
         memcpy(_data, rhs._data, bytes());
     }
 
     // move constructor
     Values<T>(Values<T> &&rhs)
     {
-        _data = rhs._data;
         _size = rhs._size;
+        _data = rhs._data;
         rhs._data = nullptr;
     }
 
@@ -49,8 +52,8 @@ public:
         if (this != &rhs)
         {
             delete _data;
-            _data = new T[rhs._size];
             _size = rhs._size;
+            _data = new T[_size];
             memcpy(_data, rhs._data, bytes());
         }
         return *this;
@@ -140,24 +143,34 @@ public:
     {
         for (unsigned i = 0; i < _size; i++)
         {
-            _data[i] = fn(_data[i], i);
+            float res = fn(_data[i], i);
+            _data[i] = res;
         }
         return *this;
     }
 
-    T *data() const
+    inline T *data() const
     {
         return _data;
     }
 
     inline uint8_t bytes() const
     {
-        return sizeof(*_data) * sizeof(T);
+        return _size * sizeof(T);
     }
 
 protected:
-    T *_data;
     uint8_t _size;
+    T *_data;
 };
+
+// ex: Values<int>(3, (const int[]){1, 2, 3})
+// Example may not compile with g++
+template <typename T>
+template <typename U>
+Values<T>::Values(uint8_t size, const U values[]) : _size(size)
+{
+    *this = values;
+}
 
 #endif

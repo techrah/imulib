@@ -100,8 +100,8 @@ public:
 
     struct Config
     {
-        Values<int8_t> asa;
-        Values<int8_t> offset;
+        Values<uint8_t> asa;
+        Values<float> offset;
         Config() : asa(3), offset(3){};
     };
 
