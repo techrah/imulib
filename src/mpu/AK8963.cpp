@@ -141,7 +141,7 @@ bool AK8963::selfTest(struct SelfTestResults *out)
     return pass;
 }
 
-error_t AK8963::startup(enum CNTL1FlagsMode mode)
+int AK8963::startup(enum CNTL1FlagsMode mode)
 {
     static const uint64_t TRY_INTERVAL_MS = 1000;
 

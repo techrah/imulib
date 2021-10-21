@@ -2,7 +2,6 @@
 #define __A65E8222_D7CE_4904_BDB9_41B3E9028F88__
 
 #include <stdint.h>
-#include <errno.h>
 #include "ICSerial.hpp"
 #include "serial/NullLogger.hpp"
 #include "Values.hpp"
@@ -111,7 +110,7 @@ public:
     virtual ~AK8963();
     virtual uint8_t whoAmI() const;
     virtual bool selfTest(struct SelfTestResults *out = nullptr);
-    virtual error_t startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
+    virtual int startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
     virtual void shutdown();
 
     // Must call startup() first
