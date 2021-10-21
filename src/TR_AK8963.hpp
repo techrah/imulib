@@ -1,0 +1,6 @@
+#ifndef __BAA97CE8_C972_4316_B0DC_48D660937D18__
+#define __BAA97CE8_C972_4316_B0DC_48D660937D18__
+
+#include "mpu/AK8963.hpp"
+
+#endif
