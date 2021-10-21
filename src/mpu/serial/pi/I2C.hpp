@@ -1,6 +1,8 @@
 #ifndef __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
 #define __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
 
+#ifdef RASPI
+
 extern "C"
 {
 #include <i2c/smbus.h>
@@ -64,4 +66,6 @@ namespace serial
         }
     };
 }
+
+#endif
 #endif

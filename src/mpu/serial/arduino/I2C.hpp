@@ -2,17 +2,7 @@
 #define __BED28A96_4CA0_43CE_BBE1_1EDBEE33AE40__
 
 #include <Wire.h>
-
-// extern "C"
-// {
-// #include <i2c/smbus.h>
-// #include <linux/i2c-dev.h>
-// }
-// #include <fcntl.h>
-// #include <sys/ioctl.h>
-// #include "../ISerial.hpp"
-// #include "../exceptions.hpp"
-// #include "../util.hpp"
+#include "../ISerial.hpp"
 
 namespace serial
 {

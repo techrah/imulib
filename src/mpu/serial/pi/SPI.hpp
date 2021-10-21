@@ -1,6 +1,8 @@
 #ifndef __B6258875_CA1E_43BE_9378_CC1AA6A049B6__
 #define __B6258875_CA1E_43BE_9378_CC1AA6A049B6__
 
+#ifdef RASPI
+
 #include <linux/spi/spidev.h>
 #include <sys/ioctl.h>
 #include <wiringPiSPI.h>
@@ -67,4 +69,5 @@ namespace serial
     };
 }
 
+#endif
 #endif
