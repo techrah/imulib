@@ -91,10 +91,12 @@ public:
 
     struct SelfTestResults
     {
+        Values<uint8_t> asa; // ASAX/Y/Z values
         Values<float> sMult; // sensitivity adjustment multiplier values
         Values<int16_t> measurements;
         Values<float> adjusted;
         bool pass;
+        SelfTestResults() : asa(3), sMult(3), measurements(3), adjusted(3) {}
     };
 
     struct Config
@@ -106,7 +108,7 @@ public:
 
 public:
     AK8963(ISerial *const, ILogger *const = new NullLogger());
-    AK8963(ISerial *const, const Config &, ILogger *const = new NullLogger());
+    AK8963(ISerial *const, const struct Config &, ILogger *const = new NullLogger());
     virtual ~AK8963();
     virtual uint8_t whoAmI() const;
     virtual bool selfTest(struct SelfTestResults *out = nullptr);

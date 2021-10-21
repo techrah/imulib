@@ -9,7 +9,7 @@ AK8963::AK8963(ISerial *const serial, ILogger *const logger)
 {
 }
 
-AK8963::AK8963(ISerial *const serial, const Config &config, ILogger *const logger)
+AK8963::AK8963(ISerial *const serial, const struct Config &config, ILogger *const logger)
     : ICSerial(serial, logger), _config(config)
 {
     _computeSensitivityMultipliers();
@@ -132,6 +132,7 @@ bool AK8963::selfTest(struct SelfTestResults *out)
 
     if (out)
     {
+        out->asa = _config.asa;
         out->sMult = *_sensitivity;
         out->measurements = values;
         out->adjusted = fv;
