@@ -5,6 +5,7 @@
 #include "pi/Logger.hpp"
 #elif defined(ARDUINO)
 #include "arduino/Logger.hpp"
+#include "arduino/SWLogger.hpp"
 #endif
 
 #endif
