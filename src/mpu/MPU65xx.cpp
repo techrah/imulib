@@ -2,7 +2,7 @@
 #include "serial/util.hpp"
 #include "SlvSerial.hpp"
 
-MPU65xx::MPU65xx(ISerial *const serial, const ILogger *const logger)
+MPU65xx::MPU65xx(ISerial *const serial, ILogger *const logger)
     : ICSerial(serial, logger)
 {
     // reset

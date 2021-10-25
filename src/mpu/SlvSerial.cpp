@@ -8,7 +8,7 @@ const uint8_t SlvSerial::I2C_SLV_REG[] = {0x26, 0x29, 0x2C, 0x2F};
 const uint8_t SlvSerial::I2C_SLV_CTRL[] = {0x27, 0x2A, 0x2D, 0x30};
 const uint8_t SlvSerial::I2C_SLV_DO[] = {0x63, 0x64, 0x65, 0x66};
 
-SlvSerial::SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *logger)
+SlvSerial::SlvSerial(uint8_t deviceAddr, serial::ISerial *serial, ILogger *const logger)
     : _deviceAddr(deviceAddr),
       _serial(serial),
       _logger(logger),

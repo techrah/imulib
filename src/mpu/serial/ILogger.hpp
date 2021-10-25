@@ -15,6 +15,7 @@ namespace serial
         };
 
     public:
+        virtual ~ILogger() {}
         virtual void print(const char *TAG, const char *val) = 0;
         virtual void print(const char *TAG, int val, enum Format format = Format::dec) = 0;
         virtual void print(const char *TAG, float val, int dp = 2) = 0;

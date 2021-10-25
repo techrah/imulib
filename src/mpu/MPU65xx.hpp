@@ -11,7 +11,7 @@ using namespace serial;
 class MPU65xx : public ICSerial
 {
 public:
-    MPU65xx(ISerial *const serial, const ILogger *const = nullptr);
+    MPU65xx(ISerial *const serial, ILogger *const = nullptr);
     ~MPU65xx();
     bool startup();
     void shutdown();

@@ -9,7 +9,7 @@ class MPU9250 : public MPU65xx
 public:
     MPU9250(ISerial *const serial,
             I2C *const auxSerial = nullptr,
-            const ILogger *const = nullptr);
+            ILogger *const = nullptr);
     MPU9250(const MPU9250 &) = delete;
     MPU9250 &operator=(const MPU9250 &) = delete;
     virtual ~MPU9250();
