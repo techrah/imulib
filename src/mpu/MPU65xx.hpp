@@ -16,6 +16,11 @@ public:
     bool startup();
     void shutdown();
     uint8_t whoAmI() const;
+    Values<int16_t> getRawAccelSensorValues();
+    Values<float> getAccelSensorValues();
+
+private:
+    Values<int16_t> _bytesToInts(const Bytes &data) const;
 };
 
 #endif
