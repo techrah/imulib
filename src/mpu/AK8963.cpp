@@ -150,6 +150,11 @@ int AK8963::startup(enum CNTL1FlagsMode mode)
                    MODE_CONTINUOUS_MEASUREMENT_1_8HZ |
                    MODE_CONTINUOUS_MEASUREMENT_2_100HZ));
 
+    if (_currentMode != MODE_POWER_DOWN)
+    {
+        return -1;
+    }
+
     if (validateDeviceId(_deviceId, TAG))
     {
         _serial->writeReg(CNTL2, SRST);
@@ -157,7 +162,7 @@ int AK8963::startup(enum CNTL1FlagsMode mode)
     }
     else
     {
-        return -1;
+        return -2;
     }
 
     if (!_sensitivity)
@@ -189,7 +194,7 @@ int AK8963::startup(enum CNTL1FlagsMode mode)
     }
 
     shutdown();
-    return -2;
+    return -3;
 }
 
 void AK8963::shutdown()

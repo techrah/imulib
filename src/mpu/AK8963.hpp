@@ -113,6 +113,7 @@ public:
     virtual bool selfTest(struct SelfTestResults *out = nullptr);
     virtual int startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
     virtual void shutdown();
+    inline virtual enum CNTL1FlagsMode currentMode() const { return _currentMode; }
 
     // Must call startup() first
     virtual Values<int16_t> getRawSensorValues();
