@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include "ICSerial.hpp"
-#include "serial/NullLogger.hpp"
 #include "Values.hpp"
 
 class AK8963 : public ICSerial
@@ -107,8 +106,8 @@ public:
     };
 
 public:
-    AK8963(ISerial *const, ILogger *const = new NullLogger());
-    AK8963(ISerial *const, const struct Config &, ILogger *const = new NullLogger());
+    AK8963(ISerial *const, const ILogger *const = nullptr);
+    AK8963(ISerial *const, const struct Config &, const ILogger *const = nullptr);
     virtual ~AK8963();
     virtual uint8_t whoAmI() const;
     virtual bool selfTest(struct SelfTestResults *out = nullptr);

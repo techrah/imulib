@@ -4,12 +4,12 @@
 
 static const char *TAG = "AK8963";
 
-AK8963::AK8963(ISerial *const serial, ILogger *const logger)
+AK8963::AK8963(ISerial *const serial, const ILogger *const logger)
     : ICSerial(serial, logger)
 {
 }
 
-AK8963::AK8963(ISerial *const serial, const struct Config &config, ILogger *const logger)
+AK8963::AK8963(ISerial *const serial, const struct Config &config, const ILogger *const logger)
     : ICSerial(serial, logger), _config(config)
 {
     _computeSensitivityMultipliers();

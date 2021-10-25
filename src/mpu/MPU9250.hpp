@@ -3,14 +3,13 @@
 
 #include "MPU65xx.hpp"
 #include "serial/I2C.hpp"
-#include "serial/NullLogger.hpp"
 
 class MPU9250 : public MPU65xx
 {
 public:
     MPU9250(ISerial *const serial,
             I2C *const auxSerial = nullptr,
-            ILogger *const logger = new NullLogger());
+            const ILogger *const = nullptr);
     MPU9250(const MPU9250 &) = delete;
     MPU9250 &operator=(const MPU9250 &) = delete;
     virtual ~MPU9250();

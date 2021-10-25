@@ -11,7 +11,7 @@ using namespace serial;
 class ICSerial
 {
 public:
-    ICSerial(ISerial *const serial, ILogger *const logger = new NullLogger());
+    ICSerial(ISerial *const serial, const ILogger *const logger = new NullLogger());
     virtual ~ICSerial();
     virtual uint8_t whoAmI() const = 0;
     virtual bool validateDeviceId(uint8_t deviceId, const char *name) const;
@@ -20,7 +20,7 @@ public:
 
 protected:
     ISerial *const _serial;
-    ILogger *const _logger;
+    const ILogger *_logger;
 };
 
 #endif

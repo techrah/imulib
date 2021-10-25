@@ -3,13 +3,18 @@
 
 static const char *TAG = "ICSerial";
 
-ICSerial::ICSerial(ISerial *const serial, ILogger *const logger)
+ICSerial::ICSerial(ISerial *const serial, const ILogger *const logger)
     : _serial(serial), _logger(logger)
 {
+    if (!logger)
+    {
+        _logger = new NullLogger();
+    }
 }
 
 ICSerial::~ICSerial()
 {
+    delete _logger;
 }
 
 bool ICSerial::validateDeviceId(uint8_t deviceId, const char *name) const

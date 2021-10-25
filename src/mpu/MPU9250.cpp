@@ -2,7 +2,7 @@
 #include "serial/util.hpp"
 #include "SlvSerial.hpp"
 
-MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, ILogger *const logger)
+MPU9250::MPU9250(ISerial *const serial, I2C *const auxSerial, const ILogger *const logger)
     : MPU65xx(serial, logger), _auxSerial(auxSerial)
 {
     if (!validateDeviceId(_deviceId, "MPU-9250"))
