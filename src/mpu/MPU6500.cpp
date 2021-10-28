@@ -1,8 +1,8 @@
-#include "MPU65xx.hpp"
+#include "MPU6500.hpp"
 #include "serial/util.hpp"
 #include "SlvSerial.hpp"
 
-MPU65xx::MPU65xx(ISerial *const serial, ILogger *const logger)
+MPU6500::MPU6500(ISerial *const serial, ILogger *const logger)
     : ICSerial(serial, logger)
 {
     // reset
@@ -12,29 +12,29 @@ MPU65xx::MPU65xx(ISerial *const serial, ILogger *const logger)
     serial::delay(10); // needs time to reset
 }
 
-bool MPU65xx::startup()
+bool MPU6500::startup()
 {
     // config accel
     _serial->writeReg(0x1C, 0b00001000); // 4g
     return true;
 }
 
-void MPU65xx::shutdown()
+void MPU6500::shutdown()
 {
     // power down
     _serial->writeReg(0x6B, 0b01000000); // SLEEP
 }
 
-MPU65xx::~MPU65xx()
+MPU6500::~MPU6500()
 {
 }
 
-uint8_t MPU65xx::whoAmI() const
+uint8_t MPU6500::whoAmI() const
 {
     return _serial->readReg(0x75);
 }
 
-Values<int16_t> MPU65xx::_bytesToInts(const Bytes &data) const
+Values<int16_t> MPU6500::_bytesToInts(const Bytes &data) const
 {
     auto bytesToInt = [&data](int16_t value, int ix)
     {
@@ -48,14 +48,14 @@ Values<int16_t> MPU65xx::_bytesToInts(const Bytes &data) const
     return res;
 }
 
-Values<int16_t> MPU65xx::getRawAccelSensorValues()
+Values<int16_t> MPU6500::getRawAccelSensorValues()
 {
     Bytes data = _serial->readReg(0x3B, 6);
     Values<int16_t> values = _bytesToInts(data);
     return values;
 }
 
-Values<float> MPU65xx::getAccelSensorValues()
+Values<float> MPU6500::getAccelSensorValues()
 {
     Values<float> values = getRawAccelSensorValues();
     return values * (1.0f / 8192);

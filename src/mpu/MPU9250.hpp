@@ -1,10 +1,10 @@
 #ifndef __E23F575C_250B_4D42_BF57_BD029A41007E__
 #define __E23F575C_250B_4D42_BF57_BD029A41007E__
 
-#include "MPU65xx.hpp"
+#include "MPU6500.hpp"
 #include "serial/I2C.hpp"
 
-class MPU9250 : public MPU65xx
+class MPU9250 : public MPU6500
 {
 public:
     MPU9250(ISerial *const serial,

@@ -8,11 +8,11 @@
 
 using namespace serial;
 
-class MPU65xx : public ICSerial
+class MPU6500 : public ICSerial
 {
 public:
-    MPU65xx(ISerial *const serial, ILogger *const = nullptr);
-    ~MPU65xx();
+    MPU6500(ISerial *const serial, ILogger *const = nullptr);
+    ~MPU6500();
     bool startup();
     void shutdown();
     uint8_t whoAmI() const;
