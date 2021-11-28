@@ -30,6 +30,12 @@ Matrix<rows, cols, MemT>::Matrix(typename MemT::elem_t arr[rows][cols])
 }
 
 template <int rows, int cols, class MemT>
+Matrix<rows, cols, MemT>::Matrix(typename MemT::elem_t arr[rows * cols])
+{
+    *this = arr;
+}
+
+template <int rows, int cols, class MemT>
 template <typename... TAIL>
 Matrix<rows, cols, MemT>::Matrix(typename MemT::elem_t head, TAIL... args)
 {
@@ -85,6 +91,15 @@ Matrix<rows, cols, MemT> &Matrix<rows, cols, MemT>::operator=(typename MemT::ele
 {
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++) (*this)(i, j) = arr[i][j];
+
+    return *this;
+}
+
+template <int rows, int cols, class MemT>
+Matrix<rows, cols, MemT> &Matrix<rows, cols, MemT>::operator=(typename MemT::elem_t arr[rows * cols])
+{
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++) (*this)(i, j) = arr[i * cols + j];
 
     return *this;
 }

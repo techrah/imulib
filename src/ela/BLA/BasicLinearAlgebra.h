@@ -30,9 +30,9 @@ class Matrix
 
     // Constructors
     Matrix<rows, cols, MemT>() = default;
-
     Matrix<rows, cols, MemT>(MemT &d);
     Matrix<rows, cols, MemT>(typename MemT::elem_t arr[rows][cols]);
+    Matrix<rows, cols, MemT>(typename MemT::elem_t arr[rows * cols]);
 
     template <class opMemT>
     Matrix<rows, cols, MemT>(const Matrix<rows, cols, opMemT> &obj);
@@ -43,8 +43,8 @@ class Matrix
     // Assignment
     template <class opMemT>
     Matrix<rows, cols, MemT> &operator=(const Matrix<rows, cols, opMemT> &obj);
-
     Matrix<rows, cols, MemT> &operator=(typename MemT::elem_t arr[rows][cols]);
+    Matrix<rows, cols, MemT> &operator=(typename MemT::elem_t arr[rows * cols]);
 
     Matrix<rows, cols, MemT> &Fill(const typename MemT::elem_t &val);
 
@@ -154,6 +154,9 @@ using LowerTriangularDiagonalOnesMatrix = Matrix<rows, cols, LowerTriangleOnesDi
 
 template <int rows, int cols, class MemT>
 using UpperTriangularMatrix = Matrix<rows, cols, UpperTriangle<MemT>>;
+
+template <int length, class ElemT = float>
+using Vector = Matrix<length, 1, Array<length, 1, ElemT>>;
 
 
 // Friends
