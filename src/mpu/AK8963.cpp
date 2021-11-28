@@ -249,9 +249,11 @@ void AK8963::setBitOutput(enum AK8963::CNTL1FlagsBitOutput bitOutput)
     }
 }
 
-Values<float> AK8963::getSensorValues()
+Vector<3> AK8963::getSensorValues()
 {
     assert(_sensitivity);
     Values<float> res = getRawSensorValues();
-    return res * *_sensitivity * _scaleFactor;
+    res *= *_sensitivity * _scaleFactor;
+    Vector<3> adj(res.data());
+    return ~(~(adj - _config.offset) * _config.transform);
 }

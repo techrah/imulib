@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include "ICSerial.hpp"
 #include "Values.hpp"
+#include "../ela/BLA/BasicLinearAlgebra.h"
+
+using namespace BLA;
 
 class AK8963 : public ICSerial
 {
@@ -101,8 +104,9 @@ public:
     struct Config
     {
         Values<uint8_t> asa;
-        Values<float> offset;
-        Config() : asa(3), offset(3){};
+        Vector<3> offset;
+        Matrix<3, 3> transform;
+        Config() : asa(3), offset({0,0,0}), transform({1,0,0,0,1,0,0,0,1}) {};
     };
 
 public:
@@ -117,7 +121,7 @@ public:
 
     // Must call startup() first
     virtual Values<int16_t> getRawSensorValues();
-    virtual Values<float> getSensorValues();
+    virtual Vector<3> getSensorValues();
 
     // Use single-reading mode
     // Do not call startup()

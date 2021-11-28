@@ -4,10 +4,13 @@
 #include "MPU6500.hpp"
 #include "serial/I2C.hpp"
 
+#include "../ela/BLA/BasicLinearAlgebra.h"
+
 class MPU9250 : public MPU6500
 {
 public:
     MPU9250(ISerial *const serial,
+            const AK8963::Config &magConfig,
             I2C *const auxSerial = nullptr,
             ILogger *const = nullptr);
     MPU9250(const MPU9250 &) = delete;
@@ -18,6 +21,8 @@ public:
     void shutdown();
     uint8_t whoAmI() const;
     AK8963 *getMag() { return _mag; }
+    Vector<3> getUprightMagValues();
+    Matrix<3, 3> getZCorrectionTransform();
 
 private:
     I2C *_auxSerial;
