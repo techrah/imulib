@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "ICSerial.hpp"
 #include "Values.hpp"
-#include "../ela/BLA/BasicLinearAlgebra.h"
+#include "../linalg/BasicLinearAlgebra.h"
 
 using namespace BLA;
 

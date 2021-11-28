@@ -4,7 +4,7 @@
 #include "MPU6500.hpp"
 #include "serial/I2C.hpp"
 
-#include "../ela/BLA/BasicLinearAlgebra.h"
+#include "../linalg/BasicLinearAlgebra.h"
 
 class MPU9250 : public MPU6500
 {

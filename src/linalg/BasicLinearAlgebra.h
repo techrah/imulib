@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ElementStorage.h"
+#include "BLA/ElementStorage.h"
 
 #ifdef min
 #undef min
@@ -51,7 +51,7 @@ class Matrix
     template <typename... TAIL>
     void FillRowMajor(typename MemT::elem_t head, TAIL... tail);
     void FillRowMajor();
-    
+
     // Math
     Matrix<rows, cols, MemT> abs() const;
     Matrix<rows, cols, MemT> pow(typename MemT::elem_t e) const;
@@ -72,10 +72,10 @@ class Matrix
 
     Matrix<rows, 1, Reference<MemT>> Column(int j);
     Matrix<rows, 1, ConstReference<MemT>> Column(int j) const;
-    
+
     Diagonal<rows, MemT> Diag();
     ConstDiagonal<MemT> Diag() const;
-    
+
     // Concatenation
     template <int operandCols, class opMemT>
     Matrix<rows, cols + operandCols, HorzCat<cols, MemT, opMemT>> operator||(
@@ -173,5 +173,5 @@ Matrix<rows, cols, MemT> operator/(const typename MemT::elem_t numerator, const 
 
 
 
-#include "impl/BasicLinearAlgebra.h"
-#include "impl/NotSoBasicLinearAlgebra.h"
+#include "BLA/BasicLinearAlgebra.h"
+#include "BLA/NotSoBasicLinearAlgebra.h"
