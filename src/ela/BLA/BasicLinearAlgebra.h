@@ -8,6 +8,14 @@
 
 #include "ElementStorage.h"
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef abs
+#undef abs
+#endif
+
 namespace BLA
 {
 template <int rows, int cols = 1, class MemT = Array<rows, cols, float>>
