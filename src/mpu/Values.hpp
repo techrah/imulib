@@ -138,6 +138,18 @@ public:
         }
     };
 
+    Values<T> operator-()
+    {
+        auto negate = [](T value, int ix)
+        {
+            return -value;
+        };
+
+        Values<T> res = *this;
+        res.apply(negate);
+        return res;
+    }
+
     template <typename Functor>
     Values<T> &apply(Functor &fn)
     {

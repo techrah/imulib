@@ -44,6 +44,7 @@ void MPU9250::selfTest(struct AK8963::SelfTestResults *magTestResults)
 
 bool MPU9250::startup()
 {
+    MPU6500::startup();
     return _mag->startup();
 }
 

@@ -229,7 +229,7 @@ Values<int16_t> AK8963::getSingleRawSensorValues()
     // Don't call shutdown(); power down is automatic
 }
 
-void AK8963::setBitOutput(enum CNTL1FlagsBitOutput bitOutput)
+void AK8963::setBitOutput(enum AK8963::CNTL1FlagsBitOutput bitOutput)
 {
     static float maxMicroTesla = 4912;
     static float maxRange_14bit = 8190;
