@@ -1,4 +1,3 @@
-#include <cmath>
 #include "MPU9250.hpp"
 #include "serial/util.hpp"
 #include "SlvSerial.hpp"
