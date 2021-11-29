@@ -155,7 +155,7 @@ public:
     {
         for (unsigned i = 0; i < _size; i++)
         {
-            float res = fn(_data[i], i);
+            auto res = fn(_data[i], i);
             _data[i] = res;
         }
         return *this;

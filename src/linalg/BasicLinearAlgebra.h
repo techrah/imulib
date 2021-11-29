@@ -43,7 +43,12 @@ class Matrix
     // Assignment
     template <class opMemT>
     Matrix<rows, cols, MemT> &operator=(const Matrix<rows, cols, opMemT> &obj);
+
+    template <class opMemT>
+    Matrix<rows, 1, MemT> &operator=(const Diagonal<rows, opMemT> &obj);
+
     Matrix<rows, cols, MemT> &operator=(typename MemT::elem_t arr[rows][cols]);
+
     Matrix<rows, cols, MemT> &operator=(typename MemT::elem_t arr[rows * cols]);
 
     Matrix<rows, cols, MemT> &Fill(const typename MemT::elem_t &val);
@@ -115,17 +120,25 @@ class Matrix
 
     // Elementwise Operations
     Matrix<rows, cols, Array<rows, cols, typename MemT::elem_t>> operator+(const typename MemT::elem_t k) const;
-
     Matrix<rows, cols, Array<rows, cols, typename MemT::elem_t>> operator-(const typename MemT::elem_t k) const;
-
     Matrix<rows, cols, Array<rows, cols, typename MemT::elem_t>> operator*(const typename MemT::elem_t k) const;
-
     Matrix<rows, cols, Array<rows, cols, typename MemT::elem_t>> operator/(const typename MemT::elem_t k) const;
 
     Matrix<rows, cols, MemT> &operator+=(const typename MemT::elem_t k);
     Matrix<rows, cols, MemT> &operator-=(const typename MemT::elem_t k);
     Matrix<rows, cols, MemT> &operator*=(const typename MemT::elem_t k);
     Matrix<rows, cols, MemT> &operator/=(const typename MemT::elem_t k);
+
+    // Misc
+    template <typename Functor>
+    Matrix<rows, cols, MemT> &rowApply(Functor &fn)
+    {
+        for (unsigned i = 0; i < rows; i++)
+        {
+            fn(Row(i), i);
+        }
+        return *this;
+    }
 };
 
 template <int rows, int cols = 1, class ElemT = float>
@@ -156,10 +169,10 @@ template <int rows, int cols, class MemT>
 using UpperTriangularMatrix = Matrix<rows, cols, UpperTriangle<MemT>>;
 
 template <int length, class ElemT = float>
-using Vector = Matrix<length, 1, Array<length, 1, ElemT>>;
+using Vector = ArrayMatrix<length, 1, ElemT>;
 
 
-// Friends
+// Operator helper for elementwise division with numerator constant, e.g. 1/X
 template <int rows, int cols = 1, class MemT = Array<rows, cols, float>>
 Matrix<rows, cols, MemT> operator/(const typename MemT::elem_t numerator, const Matrix<rows, cols, MemT> &denominator)
 {

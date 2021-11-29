@@ -93,60 +93,67 @@ public:
 
     struct SelfTestResults
     {
-        Values<uint8_t> asa; // ASAX/Y/Z values
-        Values<float> sMult; // sensitivity adjustment multiplier values
-        Values<int16_t> measurements;
-        Values<float> adjusted;
+        Vector<3, uint8_t> asa; // ASAX/Y/Z values
+        Vector<3, float> sMult; // sensitivity adjustment multiplier values
+        Vector<3, int16_t> measurements;
+        Vector<3, float> adjusted;
         bool pass;
         SelfTestResults() : asa(3), sMult(3), measurements(3), adjusted(3) {}
     };
 
     struct Config
     {
-        Values<uint8_t> asa;
+        Vector<3, uint8_t> asa;
         Vector<3> offset;
         Matrix<3, 3> transform;
-        Config() : asa(3), offset({0,0,0}), transform({1,0,0,0,1,0,0,0,1}) {};
+        // Config() : asa({0,0,0}), offset({0,0,0}), transform({1,0,0,0,1,0,0,0,1}) {};
     };
 
 public:
     AK8963(ISerial *const, ILogger *const = nullptr);
-    AK8963(ISerial *const, const struct Config &, ILogger *const = nullptr);
+    void setConfig(const struct Config &);
     virtual ~AK8963();
-    virtual uint8_t whoAmI() const;
-    virtual bool selfTest(struct SelfTestResults *out = nullptr);
-    virtual int startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
-    virtual void shutdown();
-    inline virtual enum CNTL1FlagsMode currentMode() const { return _currentMode; }
+    uint8_t whoAmI() const;
+    bool selfTest(struct SelfTestResults *out = nullptr);
+    int startup(enum CNTL1FlagsMode modeFlag = MODE_CONTINUOUS_MEASUREMENT_1_8HZ);
+    void shutdown();
+    inline enum CNTL1FlagsMode currentMode() const { return _currentMode; }
 
     // Must call startup() first
-    virtual Values<int16_t> getRawSensorValues();
-    virtual Vector<3> getSensorValues();
+    Vector<3, int16_t> getRawSensorValues();
+    Vector<3> getSensorValues();
 
     // Use single-reading mode
     // Do not call startup()
     // TODO: add config data (ASAX/Y/Z) to constructor
     // and move init/reset code out of startup()
-    virtual Values<int16_t> getSingleRawSensorValues();
+    Vector<3, int16_t> getSingleRawSensorValues();
 
     // Set bit output before calling startup
-    virtual void setBitOutput(enum CNTL1FlagsBitOutput bitOutput);
+    void setBitOutput(enum CNTL1FlagsBitOutput bitOutput);
 
-    virtual const enum CNTL1FlagsBitOutput getBitOutput() const { return _bitOutput; }
+    const enum CNTL1FlagsBitOutput getBitOutput() const { return _bitOutput; }
 
 protected:
-    virtual void _changeMode(enum CNTL1FlagsMode mode);
-    Values<int16_t> _bytesToInts(const Bytes &bytes) const;
+    void _changeMode(enum CNTL1FlagsMode mode);
+    Vector<3, int16_t> _bytesToInts(const Bytes &bytes) const;
     void _retrieveSensitivityValues();
     void _computeSensitivityMultipliers();
 
 protected:
     static const uint8_t _deviceId = 0x48;
     enum CNTL1FlagsBitOutput _bitOutput = BIT_16_BIT_OUTPUT;
-    float _scaleFactor = 4192.0f / 32760;
     enum CNTL1FlagsMode _currentMode = MODE_POWER_DOWN; // init to non-existing mode
+
+    /*
+     * Configuration and error correction
+     * _config can be persisted and used to restore calibration data
+     * _scaleFactor can be changed via setBitOutput
+     * _sensitivity is based on ASA values
+     */
     Config _config;
-    Values<float> *_sensitivity = nullptr;
+    float _scaleFactor = 4192.0f / 32760;
+    Matrix<3, 3> *_sensitivity = nullptr;
 };
 
 #endif

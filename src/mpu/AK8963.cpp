@@ -9,16 +9,21 @@ AK8963::AK8963(ISerial *const serial, ILogger *const logger)
 {
 }
 
-AK8963::AK8963(ISerial *const serial, const struct Config &config, ILogger *const logger)
-    : ICSerial(serial, logger), _config(config)
-{
-    _computeSensitivityMultipliers();
-}
-
 AK8963::~AK8963()
 {
     shutdown();
     delete _sensitivity;
+}
+
+void AK8963::setConfig(const struct Config &config)
+{
+    assert(_currentMode == MODE_POWER_DOWN);
+    if (_sensitivity)
+    {
+        delete _sensitivity;
+        _sensitivity = nullptr;
+    }
+    _config = config;
 }
 
 uint8_t AK8963::whoAmI() const
@@ -60,7 +65,7 @@ void AK8963::_changeMode(enum CNTL1FlagsMode mode)
     }
 }
 
-Values<int16_t> AK8963::_bytesToInts(const Bytes &data) const
+Vector<3, int16_t> AK8963::_bytesToInts(const Bytes &data) const
 {
     auto bytesToInt = [&data](int16_t value, int ix)
     {
@@ -71,7 +76,7 @@ Values<int16_t> AK8963::_bytesToInts(const Bytes &data) const
 
     Values<int16_t> res(3);
     res.apply(bytesToInt);
-    return res;
+    return res.data();
 }
 
 void AK8963::_retrieveSensitivityValues()
@@ -81,33 +86,34 @@ void AK8963::_retrieveSensitivityValues()
     _config.asa = b.dataBuf();
 
     _logger->print(TAG, "ASAX:");
-    _logger->print(NULL, _config.asa[0]);
+    _logger->print(NULL, _config.asa(0));
     _logger->print(NULL, ", ASAY:");
-    _logger->print(NULL, _config.asa[1]);
+    _logger->print(NULL, _config.asa(1));
     _logger->print(NULL, ", ASAZ:");
-    _logger->println(NULL, _config.asa[2]);
+    _logger->println(NULL, _config.asa(2));
 }
 
 void AK8963::_computeSensitivityMultipliers()
 {
-    auto calcMultiplier = [this](float val, int ix)
+    static const auto calcMultiplier = [this](Matrix<1, 3, Reference<Array<3, 3, float>>> row, int ix)
     {
         // AK8963 p32
-        return (_config.asa[ix] - 128) / 256.0f + 1;
+        row(0, ix) = (_config.asa(ix) - 128) / 256.0f + 1;
     };
 
     if (!_sensitivity)
     {
-        _sensitivity = new Values<float>(3);
+        _sensitivity = new Matrix<3, 3>(Zeros<3, 3>());
     }
 
-    _sensitivity->apply(calcMultiplier);
+    _sensitivity->rowApply(calcMultiplier);
+
     _logger->print(TAG, "Sensitivity multipliers: mx=");
-    _logger->print(NULL, (*_sensitivity)[0]);
+    _logger->print(NULL, (*_sensitivity)(0, 0));
     _logger->print(NULL, ", my=");
-    _logger->print(NULL, (*_sensitivity)[1]);
+    _logger->print(NULL, (*_sensitivity)(1, 1));
     _logger->print(NULL, ", mz=");
-    _logger->println(NULL, (*_sensitivity)[2]);
+    _logger->println(NULL, (*_sensitivity)(2, 2));
 }
 
 bool AK8963::selfTest(struct SelfTestResults *out)
@@ -122,18 +128,18 @@ bool AK8963::selfTest(struct SelfTestResults *out)
     auto values = getRawSensorValues();
     _changeMode(MODE_POWER_DOWN);
 
-    Values<float> fv = values;
-    fv *= *_sensitivity;
+    Vector<3> fv = values;
+    fv = *_sensitivity * fv;
 
     const float *ranges = _bitOutput == BIT_16_BIT_OUTPUT ? normalRanges16 : normalRanges14;
-    bool pass = fv[0] >= ranges[0] && fv[0] <= ranges[1] &&
-                fv[1] >= ranges[2] && fv[1] <= ranges[3] &&
-                fv[2] >= ranges[4] && fv[2] <= ranges[5];
+    bool pass = fv(0, 0) >= ranges[0] && fv(0, 0) <= ranges[1] &&
+                fv(1, 1) >= ranges[2] && fv(1, 1) <= ranges[3] &&
+                fv(2, 2) >= ranges[4] && fv(2, 2) <= ranges[5];
 
     if (out)
     {
         out->asa = _config.asa;
-        out->sMult = *_sensitivity;
+        out->sMult = _sensitivity->Diag();
         out->measurements = values;
         out->adjusted = fv;
         out->pass = pass;
@@ -202,8 +208,9 @@ void AK8963::shutdown()
     _changeMode(MODE_POWER_DOWN);
 }
 
-Values<int16_t> AK8963::getRawSensorValues()
+Vector<3, int16_t> AK8963::getRawSensorValues()
 {
+    assert(_currentMode != MODE_POWER_DOWN);
     for (;;)
     {
         for (;;)
@@ -222,7 +229,7 @@ Values<int16_t> AK8963::getRawSensorValues()
     }
 }
 
-Values<int16_t> AK8963::getSingleRawSensorValues()
+Vector<3, int16_t> AK8963::getSingleRawSensorValues()
 {
     startup(MODE_SINGLE_MEASUREMENT);
     return getRawSensorValues();
@@ -251,9 +258,8 @@ void AK8963::setBitOutput(enum AK8963::CNTL1FlagsBitOutput bitOutput)
 
 Vector<3> AK8963::getSensorValues()
 {
-    assert(_sensitivity);
-    Values<float> res = getRawSensorValues();
-    res *= *_sensitivity * _scaleFactor;
-    Vector<3> adj(res.data());
-    return ~(~(adj - _config.offset) * _config.transform);
+    assert(_currentMode != MODE_POWER_DOWN && _sensitivity);
+    Vector<3> values = getRawSensorValues();
+    values = *_sensitivity * _scaleFactor * values - _config.offset;
+    return ~(~values * _config.transform);
 }

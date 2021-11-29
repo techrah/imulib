@@ -87,6 +87,16 @@ Matrix<rows, cols, MemT> &Matrix<rows, cols, MemT>::operator=(const Matrix<rows,
 }
 
 template <int rows, int cols, class MemT>
+template <class opMemT>
+Matrix<rows, 1, MemT> &Matrix<rows, cols, MemT>::operator=(const Diagonal<rows, opMemT> &obj)
+{
+    for (int i = 0; i < rows; i++)
+        (*this)(i, 0) = obj(i);
+
+    return *this;
+}
+
+template <int rows, int cols, class MemT>
 Matrix<rows, cols, MemT> &Matrix<rows, cols, MemT>::operator=(typename MemT::elem_t arr[rows][cols])
 {
     for (int i = 0; i < rows; i++)

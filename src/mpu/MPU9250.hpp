@@ -10,12 +10,12 @@ class MPU9250 : public MPU6500
 {
 public:
     MPU9250(ISerial *const serial,
-            const AK8963::Config &magConfig,
             I2C *const auxSerial = nullptr,
             ILogger *const = nullptr);
     MPU9250(const MPU9250 &) = delete;
     MPU9250 &operator=(const MPU9250 &) = delete;
     virtual ~MPU9250();
+    void setMagConfig(const AK8963::Config &);
     void selfTest(struct AK8963::SelfTestResults *magTestResults = nullptr);
     bool startup();
     void shutdown();

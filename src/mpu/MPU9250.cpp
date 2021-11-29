@@ -5,7 +5,6 @@
 
 MPU9250::MPU9250(
     ISerial *const serial,
-    const AK8963::Config &config,
     I2C *const auxSerial,
     ILogger *const logger)
     : MPU6500(serial, logger), _auxSerial(auxSerial)
@@ -25,7 +24,7 @@ MPU9250::MPU9250(
 
     if (_auxSerial)
     {
-        _mag = new AK8963(_auxSerial, config, _logger);
+        _mag = new AK8963(_auxSerial, _logger);
     }
     else
     {
@@ -34,12 +33,17 @@ MPU9250::MPU9250(
         _serial->writeReg(0x6A, 0x20); // enable master mode (USER_CTL)
         _serial->writeReg(0x24, 0x0D); // set clock speed 400 kHz (I2C_MST_CTRL)
 
-        _mag = new AK8963(new SlvSerial(0x0C, _serial, _logger), config, _logger);
+        _mag = new AK8963(new SlvSerial(0x0C, _serial, _logger), _logger);
     }
 }
 
 MPU9250::~MPU9250()
 {
+}
+
+void MPU9250::setMagConfig(const AK8963::Config &config)
+{
+    _mag->setConfig(config);
 }
 
 void MPU9250::selfTest(struct AK8963::SelfTestResults *magTestResults)

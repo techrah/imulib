@@ -181,7 +181,7 @@ struct Diagonal
     elem_t operator()(int row) const {
         return parent(row, row);
     }
-    
+
     Diagonal<rows, MemT> &operator=(const typename MemT::elem_t arr[rows]) {
         for (int i = 0; i < rows; i++) {
             parent(i, i) = arr[i];
