@@ -53,10 +53,14 @@ void loop() {}
 
 ```cpp
 I2C *i2c_mpu = new I2C(0x68); // You can also use SPI here
-I2C *i2c_mag = new I2C(0x0C);
+I2C *i2c_mag = new I2C(0x0C); // Access magnotometer via auxiliary pins
 
-// No need to use I2C pins for magnotometer. The internal I2C connection will be used automatically!
 MPU9250 *mpu = new MPU9250(i2c_mpu, i2c_mag);
+
+// OR, use internal I2C bypass connection automatically!
+// NOTE: If your primary connection is SPI, you should set the clock speed to 400000
+// to match the I2C connection which is currently hard-coded to this speed.
+MPU9250 *mpu = new MPU9250(i2c_mpu, nulltpr);
 
 // Set mag config as before
 AK8963::Config magConfig;
